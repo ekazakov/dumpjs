@@ -30,8 +30,9 @@ function rebundle (bundler) {
 
         return bundler.bundle()
             .on('error', function (error) {
-                gutil.log(error);
-                gutil.log(error.stack);
+                // gutil.log(error);
+                gutil.log(error.message);
+                // gutil.log(error.stack);
                 // gutil.log.bind(gutil, 'Browserify Error')
             })
             .pipe(vinitlSource('index.js'))
