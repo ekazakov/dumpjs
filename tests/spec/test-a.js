@@ -94,10 +94,49 @@ describe('Test A', function () {
         expect(D.dump(obj)).to.be.eql(dumpedObj);
     });
 
-    it('Serialize empty array');
+    it('Serialize empty array', function () {
+        var arr = [];
+        var dumpedObj = JSON.stringify({
+            '@0': []
+        });
 
+        expect(D.dump(arr)).to.be.eql(dumpedObj);
+    });
 
-    it('Serialize array');
+    it('Serialize primitive array', function () {
+        var arr = [1, 2, 3];
+        var dumpedObj = JSON.stringify({'@0': [1, 2, 3]});
+
+        expect(D.dump(arr)).to.be.eql(dumpedObj);
+    });
+
+    it('Serialize composite array', function () {
+        var obj = {x: 1};
+        var arr = [1, 2, obj, 3];
+
+        var dumpedObj = JSON.stringify({
+            '@0': [1, 2, '@1', 3],
+            '@1': {x: 1}
+        });
+
+        expect(D.dump(arr)).to.be.eql(dumpedObj);
+    });
+
+    it('Serialize composite array 2', function () {
+        var obj = {x: 1, y: {z: 'a', f: {d: 1}}};
+        var arr = [1, 2, obj, 3];
+        obj.o = obj;
+        obj.y.f.a = obj;
+
+        var dumpedObj = JSON.stringify({
+            '@0': [1, 2, '@1', 3],
+            '@1': {x: 1, y: '@2', o: '@1'},
+            '@2': {z: 'a', f: '@3'},
+            '@3': {d: 1, a: '@1'}
+        });
+
+        expect(D.dump(arr)).to.be.eql(dumpedObj);
+    });
 
     it('Map test', function () {
         var m = new Map();

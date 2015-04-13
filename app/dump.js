@@ -61,26 +61,47 @@ function dump (src) {
     function _dump (serialized, unprocessed, obj, key) {
         if (!identities.has(obj)) identities.set(obj, key);
 
-        serialized[key] = clonePrimitives({}, obj);
+        if (_.isArray(obj)) {
+            serialized[key] = [];
 
-        var objs = Object
-            .keys(obj)
-            .filter(isNotPrimitive(obj))
-            .reduce(function (result, prop) {
-                var propId;
-
-                if (!identities.has(obj[prop])) {
-                    propId = getId(++id);
-                    result[prop] = propId;
-                    unprocessed.set(obj[prop], propId);
+            obj.map(function (item, index) {
+                if (isPrimitive(obj, index)) {
+                    serialized[key].push(item);
                 } else {
-                    propId = identities.get(obj[prop]);
-                    result[prop] = propId;
-                }
+                    var propId;
 
-                return result;
-            }, {})
-        ;
+                    if (!identities.has(obj[index])) {
+                        propId = getId(++id);
+                        unprocessed.set(obj[index], propId);
+                    } else {
+                        propId = identities.get(obj[index]);
+                    }
+
+                    serialized[key].push(propId);
+                }
+            });
+        } else {
+            serialized[key] = clonePrimitives({}, obj);
+
+            var objs = Object
+                .keys(obj)
+                .filter(isNotPrimitive(obj))
+                .reduce(function (result, prop) {
+                    var propId;
+
+                    if (!identities.has(obj[prop])) {
+                        propId = getId(++id);
+                        unprocessed.set(obj[prop], propId);
+                    } else {
+                        propId = identities.get(obj[prop]);
+                    }
+
+                    result[prop] = propId;
+
+                    return result;
+                }, {})
+            ;
+        }
 
         _.extend(serialized[key], objs);
     }
