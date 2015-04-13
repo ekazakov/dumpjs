@@ -37,46 +37,53 @@ function clonePrimitives (target, obj) {
     return target;
 }
 
-function dump (obj) {
+function dump (src) {
     var serialized = {};
-    var uprocessed = new Map();
+    var unprocessed = new Map();
+    var identities = new Map();
     var id = 0;
     var key = getId(id);
 
-    if (obj == null) return;
+    if (src == null) return;
 
-    serialized[key] = clonePrimitives({}, obj);
+    _dump(serialized, unprocessed, src, key);
 
+    var entries = unprocessed.entries();
+    var entry;
 
+    while ((entry = entries.next(), !entry.done)) {
+        var obj = entry.value[0];
+        var objId = entry.value[1];
 
+        _dump(serialized, unprocessed, obj, objId);
+    }
 
+    function _dump (serialized, unprocessed, obj, key) {
+        if (!identities.has(obj)) identities.set(obj, key);
 
+        serialized[key] = clonePrimitives({}, obj);
 
+        var objs = Object
+            .keys(obj)
+            .filter(isNotPrimitive(obj))
+            .reduce(function (result, prop) {
+                var propId;
 
-    // Object
-    //     .keys(obj)
-    //     .forEach(function (prop) {
-    //         if (_.isObject(obj[prop])) {
-    //             var propKey = getId(++id);
+                if (!identities.has(obj[prop])) {
+                    propId = getId(++id);
+                    result[prop] = propId;
+                    unprocessed.set(obj[prop], propId);
+                } else {
+                    propId = identities.get(obj[prop]);
+                    result[prop] = propId;
+                }
 
-    //             serialized[key][prop] = propKey;
-    //             serialized[propKey] = {};
+                return result;
+            }, {})
+        ;
 
-    //             uprocessed.set(obj[prop], propKey);
-
-    //             Object.keys(obj[prop]).forEach(function (prop2) {
-    //                 serialized[propKey][prop2] = obj[prop][prop2];
-    //             });
-    //         } else {
-    //             serialized[key][prop] = obj[prop];
-    //         }
-    //     })
-    // ;
-
-
+        _.extend(serialized[key], objs);
+    }
 
     return JSON.stringify(serialized);
-
-    function _dump (obj, id) {
-    }
 }
