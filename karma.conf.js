@@ -3,7 +3,7 @@ module.exports = function(config) {
 
     config.set({
 
-        browsers: ['Chrome', 'PhantomJS'],
+        browsers: ['Chrome'],
         reporters: ['progress', 'notify'],
         frameworks: ['mocha', 'chai-sinon', 'sinon'],
 
