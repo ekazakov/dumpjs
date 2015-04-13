@@ -1,6 +1,7 @@
 {
   "global": [
-    "Promise"
+    "Promise": true,
+    "expect": true
   ],
 
   "mocha": true,
@@ -9,7 +10,7 @@
 
   "bitwise": true,
   "boss": true,
-  "curly": true,
+  "curly": false,
   "debug": false,
   "devel": true,
   "eqeqeq": true,
