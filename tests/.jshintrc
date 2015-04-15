@@ -1,8 +1,8 @@
 {
-  "global": [
-    "Promise": true,
-    "expect": true
-  ],
+  "globals": {
+    "Promise": false,
+    "expect": false
+  },
 
   "mocha": true,
   "browser": true,
@@ -10,7 +10,6 @@
 
   "bitwise": true,
   "boss": true,
-  "curly": false,
   "debug": false,
   "devel": true,
   "eqeqeq": true,

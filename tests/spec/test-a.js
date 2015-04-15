@@ -138,6 +138,46 @@ describe('Test A', function () {
         expect(D.dump(arr)).to.be.eql(dumpedObj);
     });
 
+    it('Serialize composite array 3', function () {
+        var arr = [1, 2, [3, 4], 5, [6]];
+
+        var dumpedObj = JSON.stringify({
+            '@0': [1, 2, '@1', 5, '@2'],
+            '@1': [3, 4],
+            '@2': [6]
+        });
+
+        expect(D.dump(arr)).to.be.eql(dumpedObj);
+    });
+
+    it('Serialize composite array 4', function () {
+        var arr = [1, 2, [3, 4, [6, 7, {x: 2}]], 8, [9]];
+
+        var dumpedObj = JSON.stringify({
+            '@0': [1, 2, '@1', 8, '@2'],
+            '@1': [3, 4, '@3'],
+            '@2': [9],
+            '@3': [6, 7, '@4'],
+            '@4': {x: 2}
+        });
+
+        expect(D.dump(arr)).to.be.eql(dumpedObj);
+    });
+
+    it('Serialize recursive array', function () {
+        var arr = [1, 2, [3, 4], 8];
+        arr[2].push(arr);
+        arr.push(arr);
+
+        var dumpedObj = JSON.stringify({
+            '@0': [1, 2, '@1', 8, '@0'],
+            '@1': [3, 4, '@0']
+        });
+
+        expect(D.dump(arr)).to.be.eql(dumpedObj);
+    });
+
+
     it('Map test', function () {
         var m = new Map();
         var id = 2;

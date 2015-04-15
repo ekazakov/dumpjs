@@ -10,10 +10,6 @@ function getId (n) {
     return '@' + n;
 }
 
-function stringify (data) {
-
-}
-
 var isPrimitive = _.curry(function isPrimitive (obj, prop) {
     return !_.isObject(obj[prop]);
 });
@@ -101,9 +97,8 @@ function dump (src) {
                     return result;
                 }, {})
             ;
+            _.extend(serialized[key], objs);
         }
-
-        _.extend(serialized[key], objs);
     }
 
     return JSON.stringify(serialized);
