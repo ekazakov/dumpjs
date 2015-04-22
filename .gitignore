@@ -3,3 +3,4 @@
 .tern-port
 /tests/index.js
 /dist
+.idea/
