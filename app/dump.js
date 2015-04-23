@@ -1,107 +1,78 @@
 'use strict';
 
-var _ = require('lodash');
-
-module.exports = {
-    dump: dump
-};
+var isArray = Array.isArray;
 
 function getId (n) {
     return '@' + n;
 }
 
-var isPrimitive = _.curry(function isPrimitive (obj, prop) {
-    return !_.isObject(obj[prop]);
-});
+function isPrimitive (obj) {
+    if (arguments.length === 2) {
+        return _isPrimitive(arguments[1]);
+    } else
+        return _isPrimitive;
 
-var isNotPrimitive = _.curry(function isNotPrimitive (obj, prop) {
-    return _.isObject(obj[prop]);
-});
-
-var clone = _.curry(function clone (target, src, prop) {
-    // console.log('prop:', prop);
-    target[prop] = src[prop];
-});
-
-function clonePrimitives (target, obj) {
-    Object
-        .keys(obj)
-        .filter(isPrimitive(obj))
-        .forEach(clone(target, obj))
-    ;
-
-    return target;
+     function _isPrimitive (prop) {
+         return typeof obj[prop] === 'string' ||
+             typeof obj[prop] === 'number' ||
+             typeof obj[prop] === 'boolean';
+     }
 }
 
-function dump (src) {
+function dump (obj) {
     var serialized = {};
     var unprocessed = new Map();
     var identities = new Map();
     var id = 0;
     var key = getId(id);
-
-    if (src == null) return;
-
-    _dump(serialized, unprocessed, src, key);
-
-    var entries = unprocessed.entries();
     var entry;
 
-    while ((entry = entries.next(), !entry.done)) {
-        var obj = entry.value[0];
-        var objId = entry.value[1];
+    if (obj == null) return;
 
-        _dump(serialized, unprocessed, obj, objId);
-    }
+    _dump(obj, key);
 
-    function foobar (unprocessed, identities,   obj, prop) {
-        var propId;
+    var entries = unprocessed.entries();
 
-        if (!identities.has(obj[prop])) {
-            propId = getId(++id);
-            unprocessed.set(obj[prop], propId);
-        } else {
-            propId = identities.get(obj[prop]);
-        }
-
-        return propId;
-    }
-
-    function destruct (obj, unprocessed, identities, result, item, index) {
-        var prop = _.isArray(result) ? index : item;
-        if (isPrimitive(obj, prop)) {
-            result[prop] = obj[prop];
-        } else {
-            result[prop] = foobar(unprocessed, identities, obj, prop);
-        }
-
-        return result[prop];
-    }
-
-    function _dump (serialized, unprocessed, obj, key) {
-        if (!identities.has(obj)) identities.set(obj, key);
-
-        if (_.isArray(obj)) {
-            serialized[key] = obj.reduce(function (result, item, index) {
-
-
-                return destruct(obj, unprocessed, identities, result, item, index);
-            }, []);
-        } else {
-            serialized[key] = Object
-                .keys(obj)
-                .reduce(function (result, prop) {
-                    if (isPrimitive(obj, prop)) {
-                        result[prop] = obj[prop];
-                    } else {
-                        result[prop] = foobar(unprocessed, identities, obj, prop);
-                    }
-
-                    return result;
-                }, {})
-            ;
-        }
-    }
+    while ((entry = entries.next(), !entry.done))
+        _dump(entry.value[0], entry.value[1]);
 
     return JSON.stringify(serialized);
+
+    function _dump (obj, key) {
+        if (!identities.has(obj)) identities.set(obj, key);
+
+        var data = isArray(obj) ? obj : Object.keys(obj);
+        serialized[key] = data.reduce(destruct(obj), isArray(obj) ? [] : {});
+    }
+
+    function destruct (obj) {
+        return function (result, item, index) {
+            var prop = isArray(result) ? index : item;
+
+            if (isPrimitive(obj, prop)) {
+                result[prop] = obj[prop];
+            } else {
+                result[prop] = generateObjId(obj, prop);
+            }
+
+            return result;
+        };
+    }
+
+    function generateObjId (obj, prop) {
+        var objId;
+
+        if (!identities.has(obj[prop])) {
+            objId = getId(++id);
+            unprocessed.set(obj[prop], objId);
+        } else {
+            objId = identities.get(obj[prop]);
+        }
+
+        return objId;
+    }
 }
+
+module.exports = {
+    dump: dump
+};
