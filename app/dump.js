@@ -54,50 +54,52 @@ function dump (src) {
         _dump(serialized, unprocessed, obj, objId);
     }
 
+    function foobar (unprocessed, identities,   obj, prop) {
+        var propId;
+
+        if (!identities.has(obj[prop])) {
+            propId = getId(++id);
+            unprocessed.set(obj[prop], propId);
+        } else {
+            propId = identities.get(obj[prop]);
+        }
+
+        return propId;
+    }
+
+    function destruct (result, item, index) {
+        var prop = _.isArray(result) ? index : item;
+        if (isPrimitive(obj, prop)) {
+            result[prop] = obj[prop];
+        } else {
+            result[prop] = foobar(unprocessed, identities, obj, prop);
+        }
+
+        return result[prop];
+    }
+
     function _dump (serialized, unprocessed, obj, key) {
         if (!identities.has(obj)) identities.set(obj, key);
 
         if (_.isArray(obj)) {
-            serialized[key] = [];
+            serialized[key] = obj.reduce(function (result, item, prop) {
 
-            obj.map(function (item, index) {
-                if (isPrimitive(obj, index)) {
-                    serialized[key].push(item);
-                } else {
-                    var propId;
 
-                    if (!identities.has(obj[index])) {
-                        propId = getId(++id);
-                        unprocessed.set(obj[index], propId);
-                    } else {
-                        propId = identities.get(obj[index]);
-                    }
-
-                    serialized[key].push(propId);
-                }
-            });
+                return destruct(result, item, prop);
+            }, []);
         } else {
-            serialized[key] = clonePrimitives({}, obj);
-
-            var objs = Object
+            serialized[key] = Object
                 .keys(obj)
-                .filter(isNotPrimitive(obj))
                 .reduce(function (result, prop) {
-                    var propId;
-
-                    if (!identities.has(obj[prop])) {
-                        propId = getId(++id);
-                        unprocessed.set(obj[prop], propId);
+                    if (isPrimitive(obj, prop)) {
+                        result[prop] = obj[prop];
                     } else {
-                        propId = identities.get(obj[prop]);
+                        result[prop] = foobar(unprocessed, identities, obj, prop);
                     }
-
-                    result[prop] = propId;
 
                     return result;
                 }, {})
             ;
-            _.extend(serialized[key], objs);
         }
     }
 
