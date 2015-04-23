@@ -67,7 +67,7 @@ function dump (src) {
         return propId;
     }
 
-    function destruct (result, item, index) {
+    function destruct (obj, unprocessed, identities, result, item, index) {
         var prop = _.isArray(result) ? index : item;
         if (isPrimitive(obj, prop)) {
             result[prop] = obj[prop];
@@ -82,10 +82,10 @@ function dump (src) {
         if (!identities.has(obj)) identities.set(obj, key);
 
         if (_.isArray(obj)) {
-            serialized[key] = obj.reduce(function (result, item, prop) {
+            serialized[key] = obj.reduce(function (result, item, index) {
 
 
-                return destruct(result, item, prop);
+                return destruct(obj, unprocessed, identities, result, item, index);
             }, []);
         } else {
             serialized[key] = Object
