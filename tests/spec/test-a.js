@@ -104,8 +104,8 @@ describe('Test A', function () {
     });
 
     it('Serialize primitive array', function () {
-        var arr = [1, 2, 3];
-        var dumpedObj = JSON.stringify({'@0': [1, 2, 3]});
+        var arr = [1, 2, 3, 'abc', true];
+        var dumpedObj = JSON.stringify({'@0': [1, 2, 3, 'abc', true]});
 
         expect(D.dump(arr)).to.be.eql(dumpedObj);
     });
