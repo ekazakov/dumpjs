@@ -74,9 +74,37 @@ function dump (obj) {
 }
 
 function restore (data) {
+    var source = JSON.parse(data);
+    var keysList = keys(source);
 
+    if (keysList.length === 0) return source;
+
+    keysList.forEach(function (key) {
+        var obj = source[key];
+        keys(obj)
+            .filter(function (key) {
+                return isObjectRef(obj[key]);
+            })
+            .forEach(function iter (key) {
+                obj[key] = source[obj[key]];
+            })
+        ;
+    })
+
+    return source['@0'];
+}
+
+var regex = /^@\d{1,}$/i;
+
+function isObjectRef (key) {
+    return regex.test(key);
+}
+
+function keys (obj) {
+    return Object.keys(obj);
 }
 
 module.exports = {
-    dump: dump
+    dump: dump,
+    restore: restore
 };
