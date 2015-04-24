@@ -73,6 +73,10 @@ function dump (obj) {
     }
 }
 
+function restore (data) {
+
+}
+
 module.exports = {
     dump: dump
 };
