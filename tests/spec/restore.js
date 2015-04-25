@@ -7,41 +7,7 @@ function squeeze (str) {
 }
 
 describe('Restore objects', function () {
-    it('Restore empty object', function () {
-        var obj = {};
-        var json = D.dump(obj);
-        expect(D.restore(json)).to.be.instanceOf(Object);
-    });
 
-    it('Restore simple object', function () {
-        var obj = {x: 1, y: 'abc', z: false};
-        expect(D.restore(D.dump(obj))).to.be.eql(obj);
-    });
-
-    it('Restore deep object 1', function () {
-        var obj = {
-            x: 1,
-            y: 'abc',
-            z: false,
-            f: {a: 2}
-        };
-
-        expect(D.restore(D.dump(obj))).to.be.eql(obj);
-    });
-
-    it('Restore deep object 2', function () {
-        var obj = {
-            x: 1,
-            y: 'abc',
-            z: false,
-            f: {
-                a: 2,
-                b: {c: 'text'}
-            }
-        };
-
-        expect(D.restore(D.dump(obj))).to.be.eql(obj);
-    });
 
     it('Restore deep object 3', function () {
         var obj = {

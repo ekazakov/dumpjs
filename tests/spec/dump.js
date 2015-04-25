@@ -11,41 +11,61 @@ describe('Test A', function () {
         expect(D).to.be.not.null;
     });
 
-    it('Serialize empty obj literal', function () {
-        var dumpedObj = squeeze('{"@0": {}}');
-        expect(D.dump({})).to.be.eql(dumpedObj);
-    });
 
-    it('Serialize simple obj literal', function () {
-        var obj = {x: 1, y: 2};
-
-        var dumpedObj = JSON.stringify({'@0': {x: 1, y: 2}});
-        expect(D.dump(obj)).to.be.eql(dumpedObj);
-    });
-
-    it('Serialize composite obj literal 1', function () {
-        var obj2 = {z: 1};
-        var obj = {x: 1, y: 2, f: obj2};
-
-        var dumpedObj = JSON.stringify({
-            '@0': {x: 1, y: 2, f: '@1'},
-            '@1': {z: 1}
-        });
-        expect(D.dump(obj)).to.be.eql(dumpedObj);
-    });
-
-    it('Serialize composite obj literal 2', function () {
-        var obj2 = {z: 1};
-        var obj3 = {y: 1};
-        var obj = {x: 1, f: obj2, c: obj3};
-
-        var dumpedObj = JSON.stringify({
-            '@0': {'x': 1, 'f': '@1', 'c': '@2'},
-            '@1': {'z': 1},
-            '@2': {'y': 1}
+    describe('Empty ojbect', function () {
+        it('Serialize', function () {
+            var dumpedObj = squeeze('{"@0": {}}');
+            expect(D.dump({})).to.be.eql(dumpedObj);
         });
 
-        expect(D.dump(obj)).to.be.eql(dumpedObj);
+        it('Restore mpty object', function () {
+            var obj = {};
+            var json = D.dump(obj);
+            expect(D.restore(json)).to.be.instanceOf(Object);
+        });
+    });
+
+    describe('Simple ojbect', function () {
+        var obj = {x: 1, y: 'a', z: null, g: false};
+        it('Serialize', function () {
+            var dumpedObj = JSON.stringify({'@0': {x: 1, y: 'a', z: null, g: false}});
+            expect(D.dump(obj)).to.be.eql(dumpedObj);
+        });
+
+        it('Restore', function () {
+            expect(D.restore(D.dump(obj))).to.be.eql(obj);
+        });
+    });
+
+    describe('Simple composite object', function () {
+        var obj = {x: 1, y: 2, f: {z: 1}};
+
+        it('Serialize', function () {
+            var dumpedObj = JSON.stringify({
+                '@0': {x: 1, y: 2, f: '@1'},
+                '@1': {z: 1}
+            });
+            expect(D.dump(obj)).to.be.eql(dumpedObj);
+        });
+
+        it('Restore', function () {
+            expect(D.restore(D.dump(obj))).to.be.eql(obj);
+        });
+    });
+
+    describe('Composite object (level 2)', function () {
+        it('Serialize', function () {
+            var obj = {x: 1, f: {z: 1}, c: {y: 1}};
+
+            var dumpedObj = JSON.stringify({
+                '@0': {'x': 1, 'f': '@1', 'c': '@2'},
+                '@1': {'z': 1},
+                '@2': {'y': 1}
+            });
+
+            expect(D.dump(obj)).to.be.eql(dumpedObj);
+        });
+
     });
 
     it('Serialize composite obj literal 3', function () {
