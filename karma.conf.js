@@ -5,15 +5,22 @@ module.exports = function(config) {
 
         browsers: ['Chrome'],
         reporters: ['progress', 'notify'],
-        frameworks: ['mocha', 'chai-sinon', 'sinon'],
+        frameworks: ['browserify' ,'mocha', 'chai-sinon', 'sinon'],
 
         // list of files / patterns to load in the browser
-        files: ['tests/index.js'],
+        files: ['tests-index.js'],
+
+        preprocessors: {
+            'tests-index.js': ['browserify']
+        },
 
         client: {
             mocha: {reporter: 'html'} // change Karma's debug.html to the mocha web reporter
         },
 
+        browserify: {
+            debug: true
+        },
 
         notifyReporter: {
             reportEachFailure: true,
