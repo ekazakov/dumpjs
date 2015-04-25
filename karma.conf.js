@@ -19,13 +19,19 @@ module.exports = function(config) {
         },
 
         browserify: {
-            debug: true
+            debug: true,
+
+            configure: function(bundle) {
+                bundle.on('bundled', function(error) {
+                    if (error != null)
+                        console.error(error.message);
+                });
+            }
         },
 
         notifyReporter: {
             reportEachFailure: true,
-            reportSuccess: true,
-        },
-
+            reportSuccess: true
+        }
     });
 };
