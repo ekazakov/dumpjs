@@ -9,42 +9,6 @@ function squeeze (str) {
 describe('Restore objects', function () {
 
 
-    it('Restore deep object 3', function () {
-        var obj = {
-            x: 1,
-            y: 'abc',
-            z: false,
-            f: {
-                a: 2,
-                b: {
-                    c: 'text',
-                    d: {g: true}
-                }
-            }
-        };
-
-        expect(D.restore(D.dump(obj))).to.be.eql(obj);
-    });
-
-    it('Restore recursive object', function () {
-        var obj = { x: 1, y: 'abc'};
-        obj.z = obj;
-
-        expect(D.restore(D.dump(obj))).to.be.eql(obj);
-    });
-
-    it('Restore recursive object 2', function () {
-        var obj = { x: 1, y: 'abc', z: {a: 1}};
-        obj.z.b = obj;
-        obj.z.c = obj.z;
-
-        var obj2 = D.restore(D.dump(obj));
-        //console.log(D.dump(obj));
-        //console.log(obj);
-        //console.log(obj2);
-        expect(obj2).to.be.eql(obj);
-    });
-
     /*
         it('Serialize empty obj literal', function () {
             var dumpedObj = squeeze('{"@0": {}}');
