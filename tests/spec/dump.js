@@ -6,10 +6,6 @@ function squeeze (str) {
     return str.replace(/\s/ig, '');
 }
 describe('Test A', function () {
-    it('Simple test', function () {
-        expect(D).to.be.not.null;
-    });
-
     describe('Empty ojbect', function () {
         it('Serialize', function () {
             var dumpedObj = squeeze('{"@0": {}}');
@@ -200,7 +196,6 @@ describe('Test A', function () {
         });
     });
 
-
     describe('Composite array (level 2)', function () {
         var arr = [1, 2, [3, 4], 5, [6]];
 
@@ -219,31 +214,43 @@ describe('Test A', function () {
         });
     });
 
-    it('Serialize composite array 4', function () {
+    describe('Composite array (level 4)', function () {
         var arr = [1, 2, [3, 4, [6, 7, {x: 2}]], 8, [9]];
 
-        var dumpedObj = JSON.stringify({
-            '@0': [1, 2, '@1', 8, '@2'],
-            '@1': [3, 4, '@3'],
-            '@2': [9],
-            '@3': [6, 7, '@4'],
-            '@4': {x: 2}
+        it('Serialize', function () {
+            var dumpedObj = JSON.stringify({
+                '@0': [1, 2, '@1', 8, '@2'],
+                '@1': [3, 4, '@3'],
+                '@2': [9],
+                '@3': [6, 7, '@4'],
+                '@4': {x: 2}
+            });
+
+            expect(D.dump(arr)).to.be.eql(dumpedObj);
         });
 
-        expect(D.dump(arr)).to.be.eql(dumpedObj);
+        it('Restore', function () {
+            expect(D.restore(D.dump(arr))).to.be.eql(arr);
+        });
     });
 
-    it('Serialize recursive array', function () {
+    describe('Recursive array', function () {
         var arr = [1, 2, [3, 4], 8];
         arr[2].push(arr);
         arr.push(arr);
 
-        var dumpedObj = JSON.stringify({
-            '@0': [1, 2, '@1', 8, '@0'],
-            '@1': [3, 4, '@0']
+        it('Serialize', function () {
+            var dumpedObj = JSON.stringify({
+                '@0': [1, 2, '@1', 8, '@0'],
+                '@1': [3, 4, '@0']
+            });
+
+            expect(D.dump(arr)).to.be.eql(dumpedObj);
         });
 
-        expect(D.dump(arr)).to.be.eql(dumpedObj);
+        it('Restore', function () {
+            expect(D.restore(D.dump(arr))).to.be.eql(arr);
+        });
     });
 });
 
