@@ -15,7 +15,8 @@ function isPrimitive (obj) {
      function _isPrimitive (prop) {
          return typeof obj[prop] === 'string' ||
              typeof obj[prop] === 'number' ||
-             typeof obj[prop] === 'boolean';
+             typeof obj[prop] === 'boolean' ||
+             obj[prop] === null;
      }
 }
 
@@ -89,7 +90,7 @@ function restore (data) {
                 obj[key] = source[obj[key]];
             })
         ;
-    })
+    });
 
     return source['@0'];
 }
