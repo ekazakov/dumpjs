@@ -22,7 +22,7 @@ function isPrimitive (obj) {
 
 function dump (obj) {
     var serialized = {};
-    var unprocessed = new Map();
+    var unprocessed = [];
     var identities = new Map();
     var id = 0;
     var key = getId(id);
@@ -32,10 +32,8 @@ function dump (obj) {
 
     _dump(obj, key);
 
-    var entries = unprocessed.entries();
-
-    while ((entry = entries.next(), !entry.done))
-        _dump(entry.value[0], entry.value[1]);
+    while ((entry = unprocessed.shift(), entry != null))
+        _dump(entry[0], entry[1]);
 
     return JSON.stringify(serialized);
 
@@ -65,7 +63,7 @@ function dump (obj) {
 
         if (!identities.has(obj[prop])) {
             objId = getId(++id);
-            unprocessed.set(obj[prop], objId);
+            unprocessed.push([obj[prop], objId]);
         } else {
             objId = identities.get(obj[prop]);
         }
