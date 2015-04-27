@@ -5,7 +5,9 @@ var D = require('../../app/dump');
 function squeeze (str) {
     return str.replace(/\s/ig, '');
 }
-describe('Test A', function () {
+describe('Object litearals and arrays', function () {
+    function noop () {}
+
     describe('Empty ojbect', function () {
         it('Serialize', function () {
             var dumpedObj = squeeze('{"@0": {}}');
@@ -60,7 +62,7 @@ describe('Test A', function () {
             });
 
             expect(D.dump(obj)).to.be.eql(dumpedObj);
-        })
+        });
 
         it('Restore', function () {
             expect(D.restore(D.dump(obj))).to.be.eql(obj);
@@ -250,6 +252,61 @@ describe('Test A', function () {
 
         it('Restore', function () {
             expect(D.restore(D.dump(arr))).to.be.eql(arr);
+        });
+    });
+
+    describe('Object with functions', function () {
+        var obj = {x: 1, y: noop, b: noop, c: 3};
+
+        it('Serialize', function () {
+            var dumpedObj = JSON.stringify({
+                '@0': {x: 1, c: 3}
+            });
+
+            expect(D.dump(obj)).to.be.eql(dumpedObj);
+        });
+    });
+
+    describe('Object with date', function () {
+        var obj = {x: 1, y: new Date(), c: 3};
+
+        it('Serialize date to empty object by default', function () {
+            var dumpedObj = JSON.stringify({
+                '@0': {x: 1, y: '@1', c: 3},
+                '@1': {}
+            });
+
+            expect(D.dump(obj)).to.be.eql(dumpedObj);
+        });
+    });
+
+    describe('Custom serialization', function () {
+        var obj = {x: 1, y: new Date('2015-04-26T20:39:35.208Z'), c: 3};
+
+        function dateSerializer (key, value) {
+            if (value instanceof Date) return {value: value.toJSON()};
+
+            return value;
+        }
+
+        it('Serialize date to string', function () {
+            var dumpedObj = JSON.stringify({
+                '@0': {x: 1, y: '@1', c: 3},
+                '@1': {value: '2015-04-26T20:39:35.208Z'}
+            });
+
+            expect(D.dump(obj, {serializer: dateSerializer})).to.be.eql(dumpedObj);
+        });
+
+        it('Ignore property if serializer return undefined', function () {
+            function serializer (key, value) {
+                if (key === 'y') return;
+
+                return value;
+            }
+            var dumpedObj = JSON.stringify({'@0': {x: 1, c: 3}});
+
+            expect(D.dump(obj, {serializer: serializer})).to.be.eql(dumpedObj);
         });
     });
 });

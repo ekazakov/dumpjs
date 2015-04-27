@@ -12,15 +12,17 @@ function isPrimitive (obj) {
     } else
         return _isPrimitive;
 
-     function _isPrimitive (prop) {
-         return typeof obj[prop] === 'string' ||
-             typeof obj[prop] === 'number' ||
-             typeof obj[prop] === 'boolean' ||
-             obj[prop] === null;
-     }
+    function _isPrimitive(prop) {
+        return typeof obj[prop] === 'string' ||
+            typeof obj[prop] === 'number' ||
+            typeof obj[prop] === 'boolean' ||
+            obj[prop] === null;
+    }
 }
 
-function dump (obj) {
+
+
+function dump (obj, options) {
     var serialized = {};
     var unprocessed = [];
     var identities = new Map();
@@ -30,10 +32,10 @@ function dump (obj) {
 
     if (obj == null) return;
 
-    _dump(obj, key);
+    serialized[key] = _dump(obj, key);
 
     while ((entry = unprocessed.shift(), entry != null))
-        _dump(entry[0], entry[1]);
+        serialized[entry[1]] = _dump(entry[0], entry[1]);
 
     return JSON.stringify(serialized);
 
@@ -41,12 +43,18 @@ function dump (obj) {
         if (!identities.has(obj)) identities.set(obj, key);
 
         var data = isArray(obj) ? obj : Object.keys(obj);
-        serialized[key] = data.reduce(destruct(obj), isArray(obj) ? [] : {});
+        return data.reduce(destruct(obj), isArray(obj) ? [] : {});
     }
+
 
     function destruct (obj) {
         return function (result, item, index) {
             var prop = isArray(result) ? index : item;
+
+            obj[prop] = serializer(prop, obj[prop]);
+
+            if (typeof obj[prop] === 'function') return result;
+            if (obj[prop] === undefined) return result;
 
             if (isPrimitive(obj, prop)) {
                 result[prop] = obj[prop];
@@ -69,6 +77,12 @@ function dump (obj) {
         }
 
         return objId;
+    }
+
+    function serializer (key, value) {
+        if (options != null && typeof options.serializer === 'function')
+            return options.serializer(key, value);
+        return value;
     }
 }
 
