@@ -20,7 +20,28 @@ function isPrimitive (obj) {
     }
 }
 
+function merge (obj) {
+    var length = arguments.length;
+    var index, source, keysList, l, i, key;
 
+    if (length < 2 || obj == null) return obj;
+
+    for (index = 1; index < length; index++) {
+        source = arguments[index];
+        keysList = keys(source);
+        l = keysList.length;
+
+        for (i = 0; i < l; i++) {
+            key = keysList[i];
+            obj[key] = source[key];
+        }
+    }
+    return obj;
+};
+
+function shellowClone (obj) {
+    return isArray(obj) ? obj.slice() : merge({}, obj);
+}
 
 function dump (obj, options) {
     var serialized = {};
@@ -28,6 +49,7 @@ function dump (obj, options) {
     var identities = new Map();
     var id = 0;
     var key = getId(id);
+    var serializer = createSerializer(options);
     var entry;
 
     if (obj == null) return;
@@ -46,14 +68,16 @@ function dump (obj, options) {
         return data.reduce(destruct(obj), isArray(obj) ? [] : {});
     }
 
-
     function destruct (obj) {
         return function (result, item, index) {
             var prop = isArray(result) ? index : item;
 
-            obj[prop] = serializer(prop, obj[prop]);
+            if (hasCustomSerializer()) {
+                obj = shellowClone(obj);
+                obj[prop] = serializer(prop, obj[prop]);
+            }
 
-            if (typeof obj[prop] === 'function') return result;
+            if (isFunction(obj[prop])) return result;
             if (obj[prop] === undefined) return result;
 
             if (isPrimitive(obj, prop)) {
@@ -67,26 +91,55 @@ function dump (obj, options) {
     }
 
     function generateObjId (obj, prop) {
+        var value = obj[prop];
         var objId;
 
-        if (!identities.has(obj[prop])) {
+        if (!identities.has(value)) {
             objId = getId(++id);
-            unprocessed.push([obj[prop], objId]);
+            identities.set(value, objId);
+            unprocessed.push([value, objId]);
         } else {
-            objId = identities.get(obj[prop]);
+            objId = identities.get(value);
         }
 
         return objId;
     }
 
-    function serializer (key, value) {
-        if (options != null && typeof options.serializer === 'function')
-            return options.serializer(key, value);
-        return value;
+    function hasCustomSerializer () {
+        return options != null && isFunction(options.serializer);
     }
 }
 
-function restore (data) {
+function createSerializer (options) {
+    Object.defineProperty(serializer, '_values', {
+        value: [],
+        enumerable: false
+    });
+
+    Object.defineProperty(serializer, '_memo', {
+        value: [],
+        enumerable: false
+    });
+
+    function serializer (key, value) {
+        var index = serializer._values.indexOf(value);
+        var result;
+
+        if (index === -1) {
+            result = options.serializer(key, value);
+            serializer._values.push(value);
+            serializer._memo.push(result);
+
+            return result;
+        }
+
+        return serializer._memo[index];
+    }
+
+    return serializer;
+}
+
+function restore (data, options) {
     var source = JSON.parse(data);
     var keysList = keys(source);
 
@@ -99,12 +152,23 @@ function restore (data) {
                 return isObjectRef(obj[key]);
             })
             .forEach(function iter (key) {
-                obj[key] = source[obj[key]];
+                obj[key] = deserializer(key, source[obj[key]]);
             })
         ;
     });
 
     return source['@0'];
+
+    function deserializer (key, value) {
+        if (options != null && isFunction(options.deserializer))
+            return options.deserializer(key, value);
+
+        return value;
+    }
+}
+
+function isFunction (fn) {
+    return typeof fn === 'function';
 }
 
 var regex = /^@\d{1,}$/i;

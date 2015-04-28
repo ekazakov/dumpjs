@@ -1,5 +1,5 @@
 'use strict';
-
+var deepFreeze = require('deep-freeze-strict');
 var D = require('../../app/dump');
 
 function squeeze (str) {
@@ -15,14 +15,15 @@ describe('Object litearals and arrays', function () {
         });
 
         it('Restore mpty object', function () {
-            var obj = {};
+            var obj = deepFreeze({});
             var json = D.dump(obj);
             expect(D.restore(json)).to.be.instanceOf(Object);
         });
     });
 
     describe('Simple ojbect', function () {
-        var obj = {x: 1, y: 'a', z: null, g: false};
+        var obj = deepFreeze({x: 1, y: 'a', z: null, g: false});
+
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({'@0': {x: 1, y: 'a', z: null, g: false}});
             expect(D.dump(obj)).to.be.eql(dumpedObj);
@@ -34,7 +35,7 @@ describe('Object litearals and arrays', function () {
     });
 
     describe('Composite object (level 2)', function () {
-        var obj = {x: 1, f: {z: 1}, c: {y: 1}};
+        var obj = deepFreeze({x: 1, f: {z: 1}, c: {y: 1}});
 
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({
@@ -52,7 +53,7 @@ describe('Object litearals and arrays', function () {
     });
 
     describe('Composite object (level 3)', function () {
-        var obj = {x: 1, f: {z: 1, c: {y: 1}}};
+        var obj = deepFreeze({x: 1, f: {z: 1, c: {y: 1}}});
 
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({
@@ -74,7 +75,7 @@ describe('Object litearals and arrays', function () {
         var obj4 = {a: 1, l: obj5};
         var obj3 = {y: 1, m: obj4};
         var obj2 = {z: 1, c: obj3};
-        var obj = {x: 1, f: obj2};
+        var obj = deepFreeze({x: 1, f: obj2});
 
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({
@@ -94,7 +95,7 @@ describe('Object litearals and arrays', function () {
     });
 
     describe('Simple composite object', function () {
-        var obj = {x: 1, y: 2, f: {z: 1}};
+        var obj = deepFreeze({x: 1, y: 2, f: {z: 1}});
 
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({
@@ -115,6 +116,8 @@ describe('Object litearals and arrays', function () {
         obj2.c = obj;
         obj.a = obj;
 
+        deepFreeze(obj);
+
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({
                 '@0': {'x': 1, 'f': '@1', a: '@0'},
@@ -130,7 +133,7 @@ describe('Object litearals and arrays', function () {
     });
 
     describe('Empty array', function () {
-        var arr = [];
+        var arr = deepFreeze([]);
 
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({
@@ -146,7 +149,7 @@ describe('Object litearals and arrays', function () {
     });
 
     describe('Simple array', function () {
-        var arr = [1, 2, 3, 'abc', true, null];
+        var arr = deepFreeze([1, 2, 3, 'abc', true, null]);
 
         it('Serialize primitive array', function () {
             var dumpedObj = JSON.stringify({'@0': [1, 2, 3, 'abc', true, null]});
@@ -160,7 +163,7 @@ describe('Object litearals and arrays', function () {
     });
 
     describe('Composite array', function () {
-        var arr = [1, 2, {x: 1}, 3];
+        var arr = deepFreeze([1, 2, {x: 1}, 3]);
 
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({
@@ -182,6 +185,8 @@ describe('Object litearals and arrays', function () {
         obj.o = obj;
         obj.y.f.a = obj;
 
+        deepFreeze(arr);
+
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({
                 '@0': [1, 2, '@1', 3],
@@ -199,7 +204,7 @@ describe('Object litearals and arrays', function () {
     });
 
     describe('Composite array (level 2)', function () {
-        var arr = [1, 2, [3, 4], 5, [6]];
+        var arr = deepFreeze([1, 2, [3, 4], 5, [6]]);
 
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({
@@ -217,7 +222,7 @@ describe('Object litearals and arrays', function () {
     });
 
     describe('Composite array (level 4)', function () {
-        var arr = [1, 2, [3, 4, [6, 7, {x: 2}]], 8, [9]];
+        var arr = deepFreeze([1, 2, [3, 4, [6, 7, {x: 2}]], 8, [9]]);
 
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({
@@ -240,6 +245,7 @@ describe('Object litearals and arrays', function () {
         var arr = [1, 2, [3, 4], 8];
         arr[2].push(arr);
         arr.push(arr);
+        deepFreeze(arr);
 
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({
@@ -256,7 +262,7 @@ describe('Object litearals and arrays', function () {
     });
 
     describe('Object with functions', function () {
-        var obj = {x: 1, y: noop, b: noop, c: 3};
+        var obj = deepFreeze({x: 1, y: noop, b: noop, c: 3});
 
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({
@@ -268,7 +274,7 @@ describe('Object litearals and arrays', function () {
     });
 
     describe('Object with date', function () {
-        var obj = {x: 1, y: new Date(), c: 3};
+        var obj = deepFreeze({x: 1, y: new Date(), c: 3});
 
         it('Serialize date to empty object by default', function () {
             var dumpedObj = JSON.stringify({
@@ -281,10 +287,10 @@ describe('Object litearals and arrays', function () {
     });
 
     describe('Custom serialization', function () {
-        var obj = {x: 1, y: new Date('2015-04-26T20:39:35.208Z'), c: 3};
+        var obj = deepFreeze({x: 1, y: new Date('2015-04-26T20:39:35.208Z'), c: 3});
 
         function dateSerializer (key, value) {
-            if (value instanceof Date) return {value: value.toJSON()};
+            if (value instanceof Date) return {value: value.toJSON(), '__meta__': 'date'};
 
             return value;
         }
@@ -292,10 +298,24 @@ describe('Object litearals and arrays', function () {
         it('Serialize date to string', function () {
             var dumpedObj = JSON.stringify({
                 '@0': {x: 1, y: '@1', c: 3},
-                '@1': {value: '2015-04-26T20:39:35.208Z'}
+                '@1': {value: '2015-04-26T20:39:35.208Z', '__meta__': 'date'}
             });
 
             expect(D.dump(obj, {serializer: dateSerializer})).to.be.eql(dumpedObj);
+        });
+
+        function dateDeserializer (key, value) {
+            if (value != null && value['__meta__'] === 'date')
+                return new Date(value.value);
+            return value;
+        }
+
+        it('Restore with custom deserializer', function () {
+            var json = D.dump(obj, {serializer: dateSerializer});
+            var restoredObj = D.restore(json, {deserializer: dateDeserializer})
+            console.log('1', restoredObj);
+            console.log('2', obj);
+            expect(restoredObj).to.be.eql(obj);
         });
 
         it('Ignore property if serializer return undefined', function () {
@@ -308,6 +328,30 @@ describe('Object litearals and arrays', function () {
 
             expect(D.dump(obj, {serializer: serializer})).to.be.eql(dumpedObj);
         });
+    });
+
+    describe('Custom serialization with multi links', function () {
+        var date = new Date('2015-04-26T20:39:35.208Z');
+        var obj = {x: 1, y: date, c: 3, d: date, f: {g: date}};
+
+        deepFreeze(obj);
+
+        it('Serialieze', function () {
+            var dumpedObj = JSON.stringify({
+                '@0': {x: 1, y: '@1', c: 3, d: '@1', f: '@2'},
+                '@1': {value: '2015-04-26T20:39:35.208Z', '__meta__': 'date'},
+                '@2': {g: '@1'}
+            });
+
+            expect(D.dump(obj, {serializer: dateSerializer})).to.be.eql(dumpedObj);
+        });
+
+        function dateSerializer (key, value) {
+            if (value instanceof Date)
+                return {value: value.toJSON(), '__meta__': 'date'};
+
+            return value;
+        }
     });
 });
 
