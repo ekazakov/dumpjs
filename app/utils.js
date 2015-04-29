@@ -1,3 +1,5 @@
+'use strict';
+
 var isArray = Array.isArray;
 
 function isFunction(fn) {
