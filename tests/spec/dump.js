@@ -2,10 +2,24 @@
 var deepFreeze = require('deep-freeze-strict');
 var D = require('../../app/dump');
 
+function dateSerializer (key, value) {
+    if (value instanceof Date)
+        return {value: value.toJSON(), '__meta__': 'date'};
+
+    return value;
+}
+
+function dateDeserializer (key, value) {
+    if (value != null && value['__meta__'] === 'date')
+        return new Date(value.value);
+    return value;
+}
 function squeeze (str) {
     return str.replace(/\s/ig, '');
 }
 describe('Object litearals and arrays', function () {
+
+
     function noop () {}
 
     describe('Empty ojbect', function () {
@@ -272,7 +286,6 @@ describe('Object litearals and arrays', function () {
             expect(D.dump(obj)).to.be.eql(dumpedObj);
         });
     });
-
     describe('Object with date', function () {
         var obj = deepFreeze({x: 1, y: new Date(), c: 3});
 
@@ -285,15 +298,10 @@ describe('Object litearals and arrays', function () {
             expect(D.dump(obj)).to.be.eql(dumpedObj);
         });
     });
-
     describe('Custom serialization', function () {
+
+
         var obj = deepFreeze({x: 1, y: new Date('2015-04-26T20:39:35.208Z'), c: 3});
-
-        function dateSerializer (key, value) {
-            if (value instanceof Date) return {value: value.toJSON(), '__meta__': 'date'};
-
-            return value;
-        }
 
         it('Serialize date to string', function () {
             var dumpedObj = JSON.stringify({
@@ -303,12 +311,6 @@ describe('Object litearals and arrays', function () {
 
             expect(D.dump(obj, {serializer: dateSerializer})).to.be.eql(dumpedObj);
         });
-
-        function dateDeserializer (key, value) {
-            if (value != null && value['__meta__'] === 'date')
-                return new Date(value.value);
-            return value;
-        }
 
         it('Restore with custom deserializer', function () {
             var json = D.dump(obj, {serializer: dateSerializer});
@@ -346,12 +348,12 @@ describe('Object litearals and arrays', function () {
             expect(D.dump(obj, {serializer: dateSerializer})).to.be.eql(dumpedObj);
         });
 
-        function dateSerializer (key, value) {
-            if (value instanceof Date)
-                return {value: value.toJSON(), '__meta__': 'date'};
-
-            return value;
-        }
+        it('Restore', function () {
+            var json = D.dump(obj, {serializer: dateSerializer});
+            var restore = D.restore(json, {deserializer: dateDeserializer});
+            expect(restore).to.be.eql(obj);
+            expect(restore.y).to.be.equals(restore.d);
+        });
     });
 });
 

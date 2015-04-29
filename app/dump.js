@@ -1,47 +1,15 @@
 'use strict';
 
-var isArray = Array.isArray;
+var utils = require('./utils');
 
-function getId (n) {
-    return '@' + n;
-}
-
-function isPrimitive (obj) {
-    if (arguments.length === 2) {
-        return _isPrimitive(arguments[1]);
-    } else
-        return _isPrimitive;
-
-    function _isPrimitive(prop) {
-        return typeof obj[prop] === 'string' ||
-            typeof obj[prop] === 'number' ||
-            typeof obj[prop] === 'boolean' ||
-            obj[prop] === null;
-    }
-}
-
-function merge (obj) {
-    var length = arguments.length;
-    var index, source, keysList, l, i, key;
-
-    if (length < 2 || obj == null) return obj;
-
-    for (index = 1; index < length; index++) {
-        source = arguments[index];
-        keysList = keys(source);
-        l = keysList.length;
-
-        for (i = 0; i < l; i++) {
-            key = keysList[i];
-            obj[key] = source[key];
-        }
-    }
-    return obj;
-};
-
-function shellowClone (obj) {
-    return isArray(obj) ? obj.slice() : merge({}, obj);
-}
+var isArray = utils.isArray;
+var getId = utils.getId;
+var isPrimitive = utils.isPrimitive;
+var isFunction = utils.isFunction;
+var createObjectHandler = utils.createObjectHandler;
+var shellowClone = utils.shellowClone;
+var keys = utils.keys;
+var isObjectRef = utils.isObjectRef;
 
 function dump (obj, options) {
     var serialized = {};
@@ -49,7 +17,7 @@ function dump (obj, options) {
     var identities = new Map();
     var id = 0;
     var key = getId(id);
-    var serializer = createSerializer(options);
+    var serializer = createObjectHandler(options && options.serializer);
     var entry;
 
     if (obj == null) return;
@@ -72,10 +40,8 @@ function dump (obj, options) {
         return function (result, item, index) {
             var prop = isArray(result) ? index : item;
 
-            if (hasCustomSerializer()) {
-                obj = shellowClone(obj);
-                obj[prop] = serializer(prop, obj[prop]);
-            }
+            obj = shellowClone(obj);
+            obj[prop] = serializer(prop, obj[prop]);
 
             if (isFunction(obj[prop])) return result;
             if (obj[prop] === undefined) return result;
@@ -104,42 +70,10 @@ function dump (obj, options) {
 
         return objId;
     }
-
-    function hasCustomSerializer () {
-        return options != null && isFunction(options.serializer);
-    }
-}
-
-function createSerializer (options) {
-    Object.defineProperty(serializer, '_values', {
-        value: [],
-        enumerable: false
-    });
-
-    Object.defineProperty(serializer, '_memo', {
-        value: [],
-        enumerable: false
-    });
-
-    function serializer (key, value) {
-        var index = serializer._values.indexOf(value);
-        var result;
-
-        if (index === -1) {
-            result = options.serializer(key, value);
-            serializer._values.push(value);
-            serializer._memo.push(result);
-
-            return result;
-        }
-
-        return serializer._memo[index];
-    }
-
-    return serializer;
 }
 
 function restore (data, options) {
+    var deserializer = createObjectHandler(options && options.deserializer);
     var source = JSON.parse(data);
     var keysList = keys(source);
 
@@ -158,27 +92,6 @@ function restore (data, options) {
     });
 
     return source['@0'];
-
-    function deserializer (key, value) {
-        if (options != null && isFunction(options.deserializer))
-            return options.deserializer(key, value);
-
-        return value;
-    }
-}
-
-function isFunction (fn) {
-    return typeof fn === 'function';
-}
-
-var regex = /^@\d{1,}$/i;
-
-function isObjectRef (key) {
-    return regex.test(key);
-}
-
-function keys (obj) {
-    return Object.keys(obj);
 }
 
 module.exports = {
