@@ -2,25 +2,26 @@
 var deepFreeze = require('deep-freeze-strict');
 var D = require('../../app/dump');
 
-function dateSerializer (key, value) {
+function dateSerializer(key, value) {
     if (value instanceof Date)
         return {value: value.toJSON(), '__meta__': 'date'};
 
     return value;
 }
 
-function dateDeserializer (key, value) {
+function dateDeserializer(key, value) {
     if (value != null && value['__meta__'] === 'date')
         return new Date(value.value);
     return value;
 }
-function squeeze (str) {
+function squeeze(str) {
     return str.replace(/\s/ig, '');
 }
 describe('Object litearals and arrays', function () {
 
 
-    function noop () {}
+    function noop() {
+    }
 
     describe('Empty ojbect', function () {
         it('Serialize', function () {
@@ -321,11 +322,12 @@ describe('Object litearals and arrays', function () {
         });
 
         it('Ignore property if serializer return undefined', function () {
-            function serializer (key, value) {
+            function serializer(key, value) {
                 if (key === 'y') return;
 
                 return value;
             }
+
             var dumpedObj = JSON.stringify({'@0': {x: 1, c: 3}});
 
             expect(D.dump(obj, {serializer: serializer})).to.be.eql(dumpedObj);
@@ -353,6 +355,117 @@ describe('Object litearals and arrays', function () {
             var restore = D.restore(json, {deserializer: dateDeserializer});
             expect(restore).to.be.eql(obj);
             expect(restore.y).to.be.equals(restore.d);
+        });
+    });
+
+    describe('Custom serialization 2', function () {
+        function Person(firstName, lastName) {
+            this.firstName = firstName;
+            this.lastName = lastName
+
+            Object.defineProperty(this, 'fullName', {
+                get: function () {
+                    return this.firstName + ' ' + this.lastName;
+                },
+                enumerable: true
+            });
+        }
+
+        Person.prototype.toJSON = function () {
+            return {
+                data: {
+                    firstName: this.firstName,
+                    lastName: this.lastName
+                },
+                '__meta__': 'person'
+            };
+        }
+
+        function personSerializer(key, value) {
+            if (value instanceof Person) return value.toJSON();
+
+            return value;
+        }
+
+        function personDeserializer(key, value) {
+
+            if (value && value['__meta__'] === 'person') {
+                //console.log(value);
+                return Object.freeze(new Person(value.data.firstName, value.data.lastName));
+            }
+
+            return value;
+        }
+
+        var mikeMouse = new Person('Mike', 'Mouse');
+        var johnSnow = new Person('John', 'Snow');
+        var obj = deepFreeze({m: mikeMouse, j: johnSnow, j2: johnSnow});
+
+        it('Serialize custom object', function () {
+            var dumpedObj = JSON.stringify({
+                '@0': {m: '@1', j: '@2', j2: '@2'},
+                '@1': {data: '@3', '__meta__': 'person'},
+                '@2': {data: '@4', '__meta__': 'person'},
+                '@3': {firstName: 'Mike', lastName: 'Mouse'},
+                '@4': {firstName: 'John', lastName: 'Snow'}
+            });
+
+            expect(D.dump(obj, {serializer: personSerializer})).to.be.eql(dumpedObj);
+        });
+
+        it('Restore', function () {
+            var json = D.dump(obj, {serializer: personSerializer});
+            var restore = D.restore(json, {deserializer: personDeserializer});
+            //console.log('json', json);
+            //console.log('restore', restore);
+            //console.log(obj);
+            expect(restore.j).to.be.equals(restore.j2);
+            expect(restore).to.be.eql(obj);
+        });
+
+        // TODO add tests for frozen objects and non writable
+    });
+
+    describe('Custom serialization (Map)', function () {
+        var key1 = Object.freeze({k: 1});
+        var key2 = Object.freeze({k: 2});
+        var val1 = Object.freeze({v: 1});
+        var val2 = Object.freeze({v: 2});
+        var map = new Map([[key1, val1], [key2, val2], ['k3', 1], ['k4', val1]]);
+        var obj = deepFreeze({data: map});
+
+        function mapSerializer (key, value) {
+            var entry, iter;
+            var data = [];
+
+            if (value instanceof Map) {
+                iter = value.entries();
+
+                while ((entry = iter.next()), !entry.done)
+                    data.push(entry.value);
+
+                return {entries: data, '__meta__': 'Map'};
+            }
+
+            return value;
+        }
+
+        it('Serialize', function () {
+            var dumpedObj = JSON.stringify({
+                '@0': {'data': '@1'},
+                '@1': {'entries': '@2', '__meta__': 'Map'},
+                '@2': ['@3', '@4', '@5', '@6'],
+                '@3': ['@7', '@8'],
+                '@4': ['@9', '@10'],
+                '@5': ['k3', 1],
+                '@6': ['k4', '@8'],
+                '@7': {'k': 1},
+                '@8': {'v': 1},
+                '@9': {'k': 2},
+                '@10': {'v': 2}
+            });
+            console.log(D.dump(obj, {serializer: mapSerializer}));
+            expect(D.dump(obj, {serializer: mapSerializer})).to.be.eql(dumpedObj);
         });
     });
 });

@@ -86,12 +86,52 @@ function restore (data, options) {
                 return isObjectRef(obj[key]);
             })
             .forEach(function iter (key) {
-                obj[key] = deserializer(key, source[obj[key]]);
+                obj[key] = source[obj[key]];//deserializer(key, source[obj[key]]);
             })
         ;
     });
 
-    return source['@0'];
+    var visited = new Set();
+    var result = source['@0'];
+
+    keys(result).forEach(function (prop) {
+        if (!isPrimitive(result[prop]) && Object.isFrozen(result[prop])) return;
+
+        result[prop] = deserializer(prop, result[prop]);
+        visited.add(result[prop]);
+    });
+
+    var iter = visited.entries();
+    var entry;
+
+    while ((entry = iter.next()), !entry.done) {
+        var item = entry.value[0];
+
+        if (item == null || _isPrimitive(item) || Object.isFrozen(item))
+            continue;
+
+        keys(item).forEach(function (prop) {
+            var propDescriptor = Object.getOwnPropertyDescriptor(item, prop);
+
+            if ('set' in propDescriptor && propDescriptor.set == null) return;
+            if (propDescriptor.writable === false) return;
+
+            // TODO if returned value didn't changed, don't assign it
+            item[prop] = deserializer(prop, item[prop]);
+
+            if (!visited.has(item[prop])) visited.add(item[prop]);
+        });
+    }
+
+    // TODO create isPrimitiveProp and isPrimitive
+    function _isPrimitive (prop) {
+        return typeof prop === 'string' ||
+            typeof prop === 'number' ||
+            typeof prop === 'boolean' ||
+            prop === null;
+    }
+
+    return result;
 }
 
 module.exports = {
