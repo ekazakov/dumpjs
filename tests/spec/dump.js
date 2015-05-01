@@ -14,15 +14,34 @@ function dateDeserializer(key, value) {
         return new Date(value.value);
     return value;
 }
+
 function squeeze(str) {
     return str.replace(/\s/ig, '');
 }
-describe('Object litearals and arrays', function () {
 
+function noop() {
+}
 
-    function noop() {
+function merge(obj) {
+    var length = arguments.length;
+    var index, source, keysList, l, i, key;
+
+    if (length < 2 || obj == null) return obj;
+
+    for (index = 1; index < length; index++) {
+        source = arguments[index];
+        keysList = Object.keys(source);
+        l = keysList.length;
+
+        for (i = 0; i < l; i++) {
+            key = keysList[i];
+            obj[key] = source[key];
+        }
     }
+    return obj;
+}
 
+describe('Object litearals and arrays', function () {
     describe('Empty ojbect', function () {
         it('Serialize', function () {
             var dumpedObj = squeeze(JSON.stringify({'@0': {}}));
@@ -426,6 +445,71 @@ describe('Object litearals and arrays', function () {
         // TODO add tests for frozen objects and non writable
     });
 
+    describe('Custom serialization 3', function () {
+        var Rect = function (origin, size) {
+            this.origin = origin;
+            this.size = size;
+        };
+
+        var Point = function (x, y) {
+            this.x = x;
+            this.y = y;
+        };
+
+        var Size = function (width, height) {
+            this.width = width;
+            this.height = height;
+        };
+
+        var aRect = new Rect(new Point(0, 0), new Size(150, 150));
+        var obj = deepFreeze({rect: aRect});
+
+        function serializer(key, value) {
+            if (value instanceof Rect)
+                return {data: merge({}, value), '__meta__': 'rect'};
+
+            if (value instanceof Point)
+                return {data: merge({}, value), '__meta__': 'point'};
+
+            if (value instanceof Size)
+                return {data: merge({}, value), '__meta__': 'size'};
+
+            return value;
+        }
+
+        function deserializer(key, value) {
+            var d;
+            if (value != null && value.data != null) {
+                d = value.data;
+                if (value['__meta__'] === 'rect') return new Rect(d.origin, d.size);
+                if (value['__meta__'] === 'point') return new Point(d.x, d.y);
+                if (value['__meta__'] === 'size') return new Size(d.width, d.height);
+            }
+
+            return value;
+        }
+
+        it('Serialize', function () {
+            var dumpedObj = JSON.stringify({
+                '@0': {'rect': '@1'},
+                '@1': {'data': '@2', '__meta__': 'rect'},
+                '@2': {'origin': '@3', 'size': '@4'},
+                '@3': {'data': '@5', '__meta__': 'point'},
+                '@4': {'data': '@6', '__meta__': 'size'},
+                '@5': {'x': 0, 'y': 0},
+                '@6': {'width': 150, 'height': 150}
+            });
+
+            //console.log(D.dump(obj, {serializer: serializer}));
+            expect(D.dump(obj, {serializer: serializer})).to.be.eql(dumpedObj);
+        });
+
+        it('Restore', function () {
+            var json = D.dump(obj, {serializer: serializer});
+            expect(D.restore(json, {deserializer: deserializer})).to.be.eql(obj);
+        });
+    });
+
     describe('Custom serialization Map', function () {
         var key1 = Object.freeze({k: 1});
         var key2 = Object.freeze({k: 2});
@@ -456,10 +540,10 @@ describe('Object litearals and arrays', function () {
         function mapDeserealizer(key, value) {
             if (value && value['__meta__'] === 'Map') {
                 value.entries.forEach(function (entry, entryIndex) {
-                   entry.forEach(function (prop, index) {
-                      if (prop && prop['__meta__'] === 'Map')
-                        entry[index] = new Map(prop.entries);
-                   });
+                    entry.forEach(function (prop, index) {
+                        if (prop && prop['__meta__'] === 'Map')
+                            entry[index] = new Map(prop.entries);
+                    });
                 });
 
                 return new Map(value.entries);
@@ -502,4 +586,3 @@ describe('Object litearals and arrays', function () {
         });
     });
 });
-
