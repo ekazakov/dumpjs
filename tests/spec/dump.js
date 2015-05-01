@@ -25,7 +25,7 @@ describe('Object litearals and arrays', function () {
 
     describe('Empty ojbect', function () {
         it('Serialize', function () {
-            var dumpedObj = squeeze('{"@0": {}}');
+            var dumpedObj = squeeze(JSON.stringify({'@0': {}}));
             expect(D.dump({})).to.be.eql(dumpedObj);
         });
 
@@ -287,6 +287,7 @@ describe('Object litearals and arrays', function () {
             expect(D.dump(obj)).to.be.eql(dumpedObj);
         });
     });
+
     describe('Object with date', function () {
         var obj = deepFreeze({x: 1, y: new Date(), c: 3});
 
@@ -299,9 +300,8 @@ describe('Object litearals and arrays', function () {
             expect(D.dump(obj)).to.be.eql(dumpedObj);
         });
     });
+
     describe('Custom serialization', function () {
-
-
         var obj = deepFreeze({x: 1, y: new Date('2015-04-26T20:39:35.208Z'), c: 3});
 
         it('Serialize date to string', function () {
@@ -426,27 +426,44 @@ describe('Object litearals and arrays', function () {
         // TODO add tests for frozen objects and non writable
     });
 
-    describe('Custom serialization (Map)', function () {
+    describe('Custom serialization Map', function () {
         var key1 = Object.freeze({k: 1});
         var key2 = Object.freeze({k: 2});
         var val1 = Object.freeze({v: 1});
         var val2 = Object.freeze({v: 2});
-        var map = new Map([[key1, val1], [key2, val2], ['k3', 1], ['k4', val1]]);
+        var map2 = new Map([['a', 1], ['b', '2']]);
+        var map = new Map([[key1, val1], [key2, val2], ['k3', 1], ['k4', val1], ['m', map2]]);
         var obj = deepFreeze({data: map});
 
-        function mapSerializer (key, value) {
+        function mapToJS(map) {
             var entry, iter;
             var data = [];
 
-            if (value instanceof Map) {
-                iter = value.entries();
+            iter = map.entries();
 
-                while ((entry = iter.next()), !entry.done)
-                    data.push(entry.value);
+            while ((entry = iter.next()), !entry.done)
+                data.push(entry.value);
 
-                return {entries: data, '__meta__': 'Map'};
+            return {entries: data, '__meta__': 'Map'};
+        }
+
+        function mapSerializer(key, value) {
+            if (value instanceof Map) return mapToJS(value);
+
+            return value;
+        }
+
+        function mapDeserealizer(key, value) {
+            if (value && value['__meta__'] === 'Map') {
+                value.entries.forEach(function (entry, entryIndex) {
+                   entry.forEach(function (prop, index) {
+                      if (prop && prop['__meta__'] === 'Map')
+                        entry[index] = new Map(prop.entries);
+                   });
+                });
+
+                return new Map(value.entries);
             }
-
             return value;
         }
 
@@ -454,18 +471,34 @@ describe('Object litearals and arrays', function () {
             var dumpedObj = JSON.stringify({
                 '@0': {'data': '@1'},
                 '@1': {'entries': '@2', '__meta__': 'Map'},
-                '@2': ['@3', '@4', '@5', '@6'],
-                '@3': ['@7', '@8'],
-                '@4': ['@9', '@10'],
+                '@2': ['@3', '@4', '@5', '@6', '@7'],
+                '@3': ['@8', '@9'],
+                '@4': ['@10', '@11'],
                 '@5': ['k3', 1],
-                '@6': ['k4', '@8'],
-                '@7': {'k': 1},
-                '@8': {'v': 1},
-                '@9': {'k': 2},
-                '@10': {'v': 2}
+                '@6': ['k4', '@9'],
+                '@7': ['m', '@12'],
+                '@8': {'k': 1},
+                '@9': {'v': 1},
+                '@10': {'k': 2},
+                '@11': {'v': 2},
+                '@12': {'entries': '@13', '__meta__': 'Map'},
+                '@13': ['@14', '@15'],
+                '@14': ['a', 1],
+                '@15': ['b', '2']
             });
-            console.log(D.dump(obj, {serializer: mapSerializer}));
+            //console.log(D.dump(obj, {serializer: mapSerializer}));
             expect(D.dump(obj, {serializer: mapSerializer})).to.be.eql(dumpedObj);
+        });
+
+        // TODO deep comparision doesn't support maps. Need fix
+        it('Restore', function () {
+            var json = D.dump(obj, {serializer: mapSerializer});
+            var restore = D.restore(json, {deserializer: mapDeserealizer});
+            console.log('json', json);
+            console.log('restore', restore);
+            console.log(obj);
+            //expect(restore.j).to.be.equals(restore.j2);
+            expect(restore).to.be.eql(obj);
         });
     });
 });
