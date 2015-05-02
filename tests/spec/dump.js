@@ -1,4 +1,6 @@
 'use strict';
+require('babelify/polyfill');
+
 var deepFreeze = require('deep-freeze-strict');
 var D = require('../../app/dump');
 var merge = require('../../app/utils').merge;

@@ -6,7 +6,7 @@ module.exports = function (config) {
 
     config.set({
 
-        browsers: ['Chrome'],
+        browsers: ['Chrome', 'Firefox', 'Safari', 'Opera'],
         reporters: ['progress', 'notify', 'coverage'],
         frameworks: ['browserify', 'mocha', 'chai-sinon', 'sinon'],
 
@@ -23,10 +23,13 @@ module.exports = function (config) {
 
         browserify: {
             debug: true,
-            transform: [istanbul({
-                instrumenter: isparta,
-                ignore: ['**/node_modules/**', '**/test/**'],
-            })],
+            transform: [
+                //'babelify',
+                istanbul({
+                    instrumenter: isparta,
+                    ignore: ['**/node_modules/**', '**/test/**'],
+                })
+            ],
             configure: function (bundle) {
                 bundle.on('bundled', function (error) {
                     if (error != null)
