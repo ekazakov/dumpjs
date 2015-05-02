@@ -1,21 +1,24 @@
 {
   "name": "package",
   "version": "0.0.0",
-  "dependencies": {
-    "lodash": "^3.6.0"
-  },
   "devDependencies": {
+    "babelify": "^6.0.2",
     "browserify": "^9.0.8",
+    "browserify-istanbul": "^0.2.1",
     "chai": "^2.2.0",
     "deep-freeze-strict": "^1.1.1",
     "gulp": "^3.8.11",
     "gulp-util": "^3.0.4",
     "immutable": "^3.7.2",
+    "istanbul": "^0.3.13",
+    "jscs": "^1.13.1",
     "karma": "^0.12.31",
     "karma-browserify": "^4.1.2",
     "karma-chai": "^0.1.0",
     "karma-chai-sinon": "^0.1.4",
     "karma-chrome-launcher": "^0.1.7",
+    "karma-coverage": "git://github.com/douglasduteil/karma-coverage#next",
+    "isparta": "git://github.com/douglasduteil/isparta",
     "karma-mocha": "^0.1.10",
     "karma-notify-reporter": "^0.1.1",
     "karma-phantomjs-launcher": "^0.1.4",

@@ -1,32 +1,32 @@
 'use strict';
 
-var isArray = Array.isArray;
+const isArray = Array.isArray;
 
-function isFunction(fn) {
+function isFunction (fn) {
     return typeof fn === 'function';
 }
 
-function shellowClone(obj) {
+function shellowClone (obj) {
     return isArray(obj) ? obj.slice() : merge({}, obj);
 }
 
-function identity(key, value) {
+function identity (key, value) {
     return value;
 }
 
-var regex = /^@\d{1,}$/i;
+const regex = /^@\d{1,}$/i;
 
-function isObjectRef(key) {
+function isObjectRef (key) {
     return regex.test(key);
 }
 
-function keys(obj) {
+function keys (obj) {
     return Object.keys(obj);
 }
 
-function merge(obj) {
-    var length = arguments.length;
-    var index, source, keysList, l, i, key;
+function merge (obj) {
+    const length = arguments.length;
+    let index, source, keysList, l, i, key;
 
     if (length < 2 || obj == null) return obj;
 
@@ -52,17 +52,17 @@ module.exports = {
 
     isObjectRef: isObjectRef,
 
-    getId: function getId(n) {
+    getId: function getId (n) {
         return '@' + n;
     },
 
-    isPrimitive: function isPrimitive(obj) {
+    isPrimitive: function isPrimitive (obj) {
         if (arguments.length === 2) {
             return _isPrimitive(arguments[1]);
         } else
             return _isPrimitive;
 
-        function _isPrimitive(prop) {
+        function _isPrimitive (prop) {
             return typeof obj[prop] === 'string' ||
                 typeof obj[prop] === 'number' ||
                 typeof obj[prop] === 'boolean' ||
@@ -76,12 +76,12 @@ module.exports = {
 
     identity: identity,
 
-    createObjectHandler: function createObjectHandler(callback) {
+    createObjectHandler: function createObjectHandler (callback) {
         var memo = new Map();
 
         return isFunction(callback) ? objectHandler : identity;
 
-        function objectHandler(key, value) {
+        function objectHandler (key, value) {
             if (!memo.has(value))
                 memo.set(value, callback(key, value));
 

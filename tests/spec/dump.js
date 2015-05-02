@@ -2,27 +2,26 @@
 var deepFreeze = require('deep-freeze-strict');
 var D = require('../../app/dump');
 
-function dateSerializer(key, value) {
+function dateSerializer (key, value) {
     if (value instanceof Date)
         return {value: value.toJSON(), '__meta__': 'date'};
 
     return value;
 }
 
-function dateDeserializer(key, value) {
+function dateDeserializer (key, value) {
     if (value != null && value['__meta__'] === 'date')
         return new Date(value.value);
     return value;
 }
 
-function squeeze(str) {
+function squeeze (str) {
     return str.replace(/\s/ig, '');
 }
 
-function noop() {
-}
+function noop () {}
 
-function merge(obj) {
+function merge (obj) {
     var length = arguments.length;
     var index, source, keysList, l, i, key;
 
@@ -334,14 +333,14 @@ describe('Object litearals and arrays', function () {
 
         it('Restore with custom deserializer', function () {
             var json = D.dump(obj, {serializer: dateSerializer});
-            var restoredObj = D.restore(json, {deserializer: dateDeserializer})
+            var restoredObj = D.restore(json, {deserializer: dateDeserializer});
             console.log('1', restoredObj);
             console.log('2', obj);
             expect(restoredObj).to.be.eql(obj);
         });
 
         it('Ignore property if serializer return undefined', function () {
-            function serializer(key, value) {
+            function serializer (key, value) {
                 if (key === 'y') return;
 
                 return value;
@@ -378,9 +377,9 @@ describe('Object litearals and arrays', function () {
     });
 
     describe('Custom serialization 2', function () {
-        function Person(firstName, lastName) {
+        function Person (firstName, lastName) {
             this.firstName = firstName;
-            this.lastName = lastName
+            this.lastName = lastName;
 
             Object.defineProperty(this, 'fullName', {
                 get: function () {
@@ -398,15 +397,15 @@ describe('Object litearals and arrays', function () {
                 },
                 '__meta__': 'person'
             };
-        }
+        };
 
-        function personSerializer(key, value) {
+        function personSerializer (key, value) {
             if (value instanceof Person) return value.toJSON();
 
             return value;
         }
 
-        function personDeserializer(key, value) {
+        function personDeserializer (key, value) {
 
             if (value && value['__meta__'] === 'person') {
                 //console.log(value);
@@ -464,7 +463,7 @@ describe('Object litearals and arrays', function () {
         var aRect = new Rect(new Point(0, 0), new Size(150, 150));
         var obj = deepFreeze({rect: aRect});
 
-        function serializer(key, value) {
+        function serializer (key, value) {
             if (value instanceof Rect)
                 return {data: merge({}, value), '__meta__': 'rect'};
 
@@ -477,7 +476,7 @@ describe('Object litearals and arrays', function () {
             return value;
         }
 
-        function deserializer(key, value) {
+        function deserializer (key, value) {
             var d;
             if (value != null && value.data != null) {
                 d = value.data;
@@ -519,7 +518,7 @@ describe('Object litearals and arrays', function () {
         var map = new Map([[key1, val1], [key2, val2], ['k3', 1], ['k4', val1], ['m', map2]]);
         var obj = deepFreeze({data: map});
 
-        function mapToJS(map) {
+        function mapToJS (map) {
             var entry, iter;
             var data = [];
 
@@ -531,15 +530,15 @@ describe('Object litearals and arrays', function () {
             return {entries: data, '__meta__': 'Map'};
         }
 
-        function mapSerializer(key, value) {
+        function mapSerializer (key, value) {
             if (value instanceof Map) return mapToJS(value);
 
             return value;
         }
 
-        function mapDeserealizer(key, value) {
+        function mapDeserealizer (key, value) {
             if (value && value['__meta__'] === 'Map') {
-                value.entries.forEach(function (entry, entryIndex) {
+                value.entries.forEach(function (entry) {
                     entry.forEach(function (prop, index) {
                         if (prop && prop['__meta__'] === 'Map')
                             entry[index] = new Map(prop.entries);

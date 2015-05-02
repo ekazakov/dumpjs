@@ -1,10 +1,6 @@
 {
+    "esnext": true,
     "requireCurlyBraces": [
-        "if",
-        "else",
-        "for",
-        "while",
-        "do",
         "try",
         "catch"
     ],
@@ -23,7 +19,7 @@
     "disallowMixedSpacesAndTabs": true,
     "disallowTrailingWhitespace": true,
     "disallowSpaceAfterPrefixUnaryOperators": true,
-    "disallowMultipleVarDecl": true,
+    "disallowMultipleVarDecl": "exceptUndefined",
 
     "requireSpaceAfterKeywords": [
       "if",
@@ -77,7 +73,5 @@
 
     "validateParameterSeparator": ", ",
 
-    "disallowKeywordsOnNewLine": ["else"],
-
-    "errorFilter": "./.jscs/error-filter.js"
+    "disallowKeywordsOnNewLine": ["else"]
 }
