@@ -2,8 +2,8 @@
 require('babelify/polyfill');
 
 var deepFreeze = require('deep-freeze-strict');
-var D = require('../../app/dump');
-var merge = require('../../app/utils').merge;
+var D = require('../../src/dump');
+var merge = require('../../src/utils').merge;
 
 function dateSerializer (key, value) {
     if (value instanceof Date)

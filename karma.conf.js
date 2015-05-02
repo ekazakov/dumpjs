@@ -6,15 +6,20 @@ module.exports = function (config) {
 
     config.set({
 
-        browsers: ['Chrome', 'Firefox', 'Safari', 'Opera'],
+        browsers: [
+            'Chrome',
+            'Firefox',
+            'Safari',
+            'Opera'
+        ],
         reporters: ['progress', 'notify', 'coverage'],
         frameworks: ['browserify', 'mocha', 'chai-sinon', 'sinon'],
 
         // list of files / patterns to load in the browser
-        files: ['tests-index.js'],
+        files: ['./tests/spec/**/*.js'],
 
         preprocessors: {
-            'tests-index.js': ['browserify']
+            './tests/spec/**/*.js': ['browserify']
         },
 
         client: {
