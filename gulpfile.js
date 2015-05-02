@@ -5,6 +5,7 @@ var gutil = require('gulp-util');
 var path = require('path');
 var browserify = require('browserify');
 var watchify = require('watchify');
+var karma = require('gulp-karma');
 
 var vinitlSource = require('vinyl-source-stream');
 // var buffer = require('vinyl-buffer');
@@ -16,10 +17,9 @@ gutil.log('path:', testsIndex);
 
 var testsBundler = watchify(browserify(testsIndex, watchify.args));
 
-gulp.task('tests', function () {
-    rebundle(testsBundler, testsIndex)();
-});
-
+//gulp.task('tests', function () {
+//    rebundle(testsBundler, testsIndex)();
+//});
 
 testsBundler.on('update', rebundle(testsBundler, testsIndex));
 testsBundler.on('log', gutil.log);
@@ -38,6 +38,22 @@ function rebundle (bundler) {
             .pipe(vinitlSource('index.js'))
             // .pipe(buffer())
             .pipe(gulp.dest('./tests'))
-        ;
+            ;
     };
 }
+
+gulp.task('test', function () {
+    // Be sure to return the stream
+    return gulp.src(['./tests/spec/*'])
+        .pipe(karma({
+            configFile: 'karma.conf.js',
+            action: 'run'
+        }))
+        .on('error', function (err) {
+            // Make sure failed tests cause gulp to exit non-zero
+            throw err;
+        })
+        .on('end', function () {
+            gutil.log('Done!');
+        });
+});

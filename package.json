@@ -8,6 +8,7 @@
     "chai": "^2.2.0",
     "deep-freeze-strict": "^1.1.1",
     "gulp": "^3.8.11",
+    "gulp-karma": "0.0.4",
     "gulp-util": "^3.0.4",
     "immutable": "^3.7.2",
     "isparta": "git://github.com/douglasduteil/isparta",
