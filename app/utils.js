@@ -47,18 +47,21 @@ export function getId (n) {
     return '@' + n;
 }
 
-export function isPrimitive (obj) {
+export function isPrimitiveProperty (obj) {
     if (arguments.length === 2) {
-        return _isPrimitive(arguments[1]);
+        const prop = arguments[1];
+        return isPrimitive(obj[prop]);
     } else
-        return _isPrimitive;
+        return function (prop) {
+            return isPrimitive(obj[prop]);
+        };
+}
 
-    function _isPrimitive (prop) {
-        return typeof obj[prop] === 'string' ||
-            typeof obj[prop] === 'number' ||
-            typeof obj[prop] === 'boolean' ||
-            obj[prop] === null;
-    }
+export function isPrimitive (value) {
+    return typeof value === 'string' ||
+        typeof value === 'number' ||
+        typeof value === 'boolean' ||
+        value === null;
 }
 
 export function createObjectHandler (callback) {

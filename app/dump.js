@@ -3,6 +3,7 @@
 import {
     isArray,
     getId,
+    isPrimitiveProperty,
     isPrimitive,
     isFunction,
     createObjectHandler,
@@ -45,7 +46,7 @@ function dump (root, options) {
             if (isFunction(obj[prop])) return result;
             if (obj[prop] === undefined) return result;
 
-            if (isPrimitive(obj, prop)) {
+            if (isPrimitiveProperty(obj, prop)) {
                 result[prop] = obj[prop];
             } else {
                 result[prop] = generateObjId(obj, prop);
@@ -72,6 +73,7 @@ function dump (root, options) {
 }
 
 function restore (data, options) {
+    const visited = new Set();
     const deserializer = createObjectHandler(options && options.deserializer);
     const source = JSON.parse(data);
     const keysList = keys(source);
@@ -90,46 +92,30 @@ function restore (data, options) {
         ;
     });
 
-    const visited = new Set();
-    const result = source['@0'];
-
-    keys(result).forEach(function (prop) {
-        if (!isPrimitive(result[prop]) && Object.isFrozen(result[prop])) return;
-
-        result[prop] = deserializer(prop, result[prop]);
-        visited.add(result[prop]);
-    });
+    keys(source['@0']).forEach(createPropHandler(source['@0'], visited, deserializer));
 
     for (let item of visited) {
-        if (item == null || _isPrimitive(item) || Object.isFrozen(item))
+        if (item == null || isPrimitive(item) || Object.isFrozen(item))
             continue;
 
-        keys(item).forEach(createPeopHandler(item));
+        keys(item).forEach(createPropHandler(item, visited, deserializer));
     }
 
-    function createPeopHandler (item) {
-        return function propertyHandler (prop) {
-            const propDescriptor = Object.getOwnPropertyDescriptor(item, prop);
+    return source['@0'];
+}
 
-            if ('set' in propDescriptor && propDescriptor.set == null) return;
-            if (propDescriptor.writable === false) return;
+function createPropHandler (item, visited, deserializer) {
+    return function propertyHandler (prop) {
+        const propDescriptor = Object.getOwnPropertyDescriptor(item, prop);
 
-            // TODO if returned value didn't changed, don't assign it
-            item[prop] = deserializer(prop, item[prop]);
+        if ('set' in propDescriptor && propDescriptor.set == null) return;
+        if (propDescriptor.writable === false) return;
 
-            if (!visited.has(item[prop])) visited.add(item[prop]);
-        };
-    }
+        // TODO if returned value didn't changed, don't assign it
+        item[prop] = deserializer(prop, item[prop]);
 
-    // TODO create isPrimitiveProp and isPrimitive
-    function _isPrimitive (prop) {
-        return typeof prop === 'string' ||
-            typeof prop === 'number' ||
-            typeof prop === 'boolean' ||
-            prop === null;
-    }
-
-    return result;
+        if (!visited.has(item[prop])) visited.add(item[prop]);
+    };
 }
 
 module.exports = {
