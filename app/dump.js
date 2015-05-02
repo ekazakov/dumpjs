@@ -1,44 +1,43 @@
 'use strict';
 
-var utils = require('./utils');
+import {
+    isArray,
+    getId,
+    isPrimitive,
+    isFunction,
+    createObjectHandler,
+    shellowClone,
+    keys,
+    isObjectRef
+    } from './utils';
 
-var isArray = utils.isArray;
-var getId = utils.getId;
-var isPrimitive = utils.isPrimitive;
-var isFunction = utils.isFunction;
-var createObjectHandler = utils.createObjectHandler;
-var shellowClone = utils.shellowClone;
-var keys = utils.keys;
-var isObjectRef = utils.isObjectRef;
+function dump (root, options) {
+    const serialized = {};
+    const unprocessed = [];
+    const identities = new Map();
+    let id = 0;
+    const key = getId(id);
+    const serializer = createObjectHandler(options && options.serializer);
 
-function dump (obj, options) {
-    var serialized = {};
-    var unprocessed = [];
-    var identities = new Map();
-    var id = 0;
-    var key = getId(id);
-    var serializer = createObjectHandler(options && options.serializer);
-    var entry;
+    if (root == null) return;
 
-    if (obj == null) return;
+    serialized[key] = _dump(root, key);
 
-    serialized[key] = _dump(obj, key);
-
-    while ((entry = unprocessed.shift(), entry != null))
-        serialized[entry[1]] = _dump(entry[0], entry[1]);
+    for (let [obj, identifier] of unprocessed)
+        serialized[identifier] = _dump(obj, identifier);
 
     return JSON.stringify(serialized);
 
-    function _dump (obj, key) {
-        if (!identities.has(obj)) identities.set(obj, key);
+    function _dump (obj, identifier) {
+        if (!identities.has(obj)) identities.set(obj, identifier);
 
-        var data = isArray(obj) ? obj : Object.keys(obj);
+        const data = isArray(obj) ? obj : Object.keys(obj);
         return data.reduce(destruct(obj), isArray(obj) ? [] : {});
     }
 
     function destruct (obj) {
         return function (result, item, index) {
-            var prop = isArray(result) ? index : item;
+            const prop = isArray(result) ? index : item;
 
             obj = shellowClone(obj);
             obj[prop] = serializer(prop, obj[prop]);
@@ -57,8 +56,8 @@ function dump (obj, options) {
     }
 
     function generateObjId (obj, prop) {
-        var value = obj[prop];
-        var objId;
+        const value = obj[prop];
+        let objId;
 
         if (!identities.has(value)) {
             objId = getId(++id);
@@ -73,14 +72,14 @@ function dump (obj, options) {
 }
 
 function restore (data, options) {
-    var deserializer = createObjectHandler(options && options.deserializer);
-    var source = JSON.parse(data);
-    var keysList = keys(source);
+    const deserializer = createObjectHandler(options && options.deserializer);
+    const source = JSON.parse(data);
+    const keysList = keys(source);
 
     if (keysList.length === 0) return source;
 
     keysList.forEach(function (key) {
-        var obj = source[key];
+        const obj = source[key];
         keys(obj)
             .filter(function (key) {
                 return isObjectRef(obj[key]);
@@ -91,8 +90,8 @@ function restore (data, options) {
         ;
     });
 
-    var visited = new Set();
-    var result = source['@0'];
+    const visited = new Set();
+    const result = source['@0'];
 
     keys(result).forEach(function (prop) {
         if (!isPrimitive(result[prop]) && Object.isFrozen(result[prop])) return;
@@ -101,28 +100,25 @@ function restore (data, options) {
         visited.add(result[prop]);
     });
 
-    var iter = visited.entries();
-    var entry;
-
-    while ((entry = iter.next()), !entry.done) {
-        var item = entry.value[0];
-
+    for (let item of visited) {
         if (item == null || _isPrimitive(item) || Object.isFrozen(item))
             continue;
 
-        keys(item).forEach(propertyHandler);
+        keys(item).forEach(createPeopHandler(item));
     }
 
-    function propertyHandler (prop) {
-        var propDescriptor = Object.getOwnPropertyDescriptor(item, prop);
+    function createPeopHandler (item) {
+        return function propertyHandler (prop) {
+            const propDescriptor = Object.getOwnPropertyDescriptor(item, prop);
 
-        if ('set' in propDescriptor && propDescriptor.set == null) return;
-        if (propDescriptor.writable === false) return;
+            if ('set' in propDescriptor && propDescriptor.set == null) return;
+            if (propDescriptor.writable === false) return;
 
-        // TODO if returned value didn't changed, don't assign it
-        item[prop] = deserializer(prop, item[prop]);
+            // TODO if returned value didn't changed, don't assign it
+            item[prop] = deserializer(prop, item[prop]);
 
-        if (!visited.has(item[prop])) visited.add(item[prop]);
+            if (!visited.has(item[prop])) visited.add(item[prop]);
+        };
     }
 
     // TODO create isPrimitiveProp and isPrimitive

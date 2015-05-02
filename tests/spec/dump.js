@@ -1,6 +1,7 @@
 'use strict';
 var deepFreeze = require('deep-freeze-strict');
 var D = require('../../app/dump');
+var merge = require('../../app/utils').merge;
 
 function dateSerializer (key, value) {
     if (value instanceof Date)
@@ -20,25 +21,6 @@ function squeeze (str) {
 }
 
 function noop () {}
-
-function merge (obj) {
-    var length = arguments.length;
-    var index, source, keysList, l, i, key;
-
-    if (length < 2 || obj == null) return obj;
-
-    for (index = 1; index < length; index++) {
-        source = arguments[index];
-        keysList = Object.keys(source);
-        l = keysList.length;
-
-        for (i = 0; i < l; i++) {
-            key = keysList[i];
-            obj[key] = source[key];
-        }
-    }
-    return obj;
-}
 
 describe('Object litearals and arrays', function () {
     describe('Empty ojbect', function () {

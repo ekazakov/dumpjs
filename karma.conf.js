@@ -23,7 +23,7 @@ module.exports = function (config) {
 
         browserify: {
             debug: true,
-            transform: ['babelify', istanbul({
+            transform: [istanbul({
                 instrumenter: isparta,
                 ignore: ['**/node_modules/**', '**/test/**'],
             })],
