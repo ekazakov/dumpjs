@@ -14,8 +14,7 @@ module.exports = function (config) {
         files: ['tests-index.js'],
 
         preprocessors: {
-            'app/*.js': ['coverage'],
-            'tests-index.js': [ 'browserify']
+            'tests-index.js': ['browserify']
         },
 
         client: {
@@ -35,16 +34,6 @@ module.exports = function (config) {
                 });
             }
         },
-
-        //coverageReporter: {
-        //    // configure the reporter to use isparta for JavaScript coverage
-        //    // Only on { "karma-coverage": "douglasduteil/karma-coverage#next" }
-        //    //ignore: ['**/node_modules/**', '**/test/**'],
-        //    instrumenters: {isparta: require('isparta')},
-        //    instrumenter: {
-        //        '*.js': 'isparta'
-        //    }
-        //},
 
         notifyReporter: {
             reportEachFailure: true,

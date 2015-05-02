@@ -110,17 +110,19 @@ function restore (data, options) {
         if (item == null || _isPrimitive(item) || Object.isFrozen(item))
             continue;
 
-        keys(item).forEach(function (prop) {
-            var propDescriptor = Object.getOwnPropertyDescriptor(item, prop);
+        keys(item).forEach(propertyHandler);
+    }
 
-            if ('set' in propDescriptor && propDescriptor.set == null) return;
-            if (propDescriptor.writable === false) return;
+    function propertyHandler (prop) {
+        var propDescriptor = Object.getOwnPropertyDescriptor(item, prop);
 
-            // TODO if returned value didn't changed, don't assign it
-            item[prop] = deserializer(prop, item[prop]);
+        if ('set' in propDescriptor && propDescriptor.set == null) return;
+        if (propDescriptor.writable === false) return;
 
-            if (!visited.has(item[prop])) visited.add(item[prop]);
-        });
+        // TODO if returned value didn't changed, don't assign it
+        item[prop] = deserializer(prop, item[prop]);
+
+        if (!visited.has(item[prop])) visited.add(item[prop]);
     }
 
     // TODO create isPrimitiveProp and isPrimitive
