@@ -1,6 +1,7 @@
 {
     "name": "dump",
     "version": "0.1.0",
+    "description": "Serialize and deserialize any JS objects to JSON",
     "repository": {
         "type": "git",
         "url": "git@github.com:ekazakov/dumpjs.git"
