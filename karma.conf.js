@@ -7,6 +7,7 @@ module.exports = function (config) {
     config.set({
 
         browsers: [
+            //'PhantomJS',
             'Chrome',
             'Firefox',
             'Safari',
@@ -46,6 +47,8 @@ module.exports = function (config) {
         notifyReporter: {
             reportEachFailure: true,
             reportSuccess: true
-        }
+        },
+
+        logLevel: 'LOG_INFO',
     });
 };
