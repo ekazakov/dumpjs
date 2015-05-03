@@ -2,6 +2,10 @@
 
 export const isArray = Array.isArray;
 
+export const merge = Object.assign;
+
+export const keys = Object.keys;
+
 export function isFunction (fn) {
     return typeof fn === 'function';
 }
@@ -20,36 +24,12 @@ export function isObjectRef (key) {
     return regex.test(key);
 }
 
-export function keys (obj) {
-    return Object.keys(obj);
-}
-
-export function merge (obj) {
-    const length = arguments.length;
-
-    if (length < 2 || obj == null) return obj;
-
-    for (let index = 1; index < length; index++) {
-        const source = arguments[index];
-        const keysList = keys(source);
-        const l = keysList.length;
-
-        for (let i = 0; i < l; i++) {
-            const key = keysList[i];
-            obj[key] = source[key];
-        }
-    }
-
-    return obj;
-}
-
 export function getId (n) {
     return '@' + n;
 }
 
-export function isPrimitiveProperty (obj) {
-    if (arguments.length === 2) {
-        const prop = arguments[1];
+export function isPrimitiveProperty (obj, prop) {
+    if (prop != null) {
         return isPrimitive(obj[prop]);
     } else
         return function (prop) {
