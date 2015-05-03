@@ -1,6 +1,8 @@
 'use strict';
 require('babelify/polyfill');
 
+// TODO add mocha tests in node
+//var expect = require('chai').expect;
 var deepFreeze = require('deep-freeze-strict');
 var D = require('../../src/dump');
 var merge = require('../../src/utils').merge;
