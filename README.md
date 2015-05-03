@@ -1,7 +1,5 @@
 # dumpjs
 
-Serialize and deserialize any JS objects to JSON.
-
 Sometimes you need serialize your objects to JSON and deserialize them back again. 
 But JSON stringify/parse is not enough, 
 because you need support circular links and restore custom object.
@@ -50,10 +48,13 @@ restored[0] === restored[1]; // true
 
 **Custom serializers/deserializers**
 
-Function `dump` recives options as second argument.
+**`D.dump(object|array[,options])`** 
 
-`serializer` – function for custom serialization. 
-Receives property name and value. Return `undefined` to prevent property serialization. 
+`options.serializer(key, value)` 
+Custom serialization:
+- Return `undefined`, if you want prevent serialization of the property. If function returns `null`, then property will be serialized as `null` (`JSON.stringify` converts `undefined` to `null`).
+- Memorizes received value and invocation result. For the same value always return the same result.
+
 
 ```js
 var obj = {m: new Map ([['a', 1], ['b', 2]])};
@@ -66,7 +67,22 @@ function mapSerializer (key, obj) {
 
     return obj;
 }
+
+// {
+//   "@0": {"map": "@1"},
+//   "@1": {"entries": "@2", "__meta__": "ES6Map"},
+//   "@2": ["@3", "@4"],
+//   "@3": ["a", 1],
+//   "@4": ["b", 2]
+// }
 ```
+
+**`D.restore(string[,options])`**
+
+`options.deserializer(key, value)` 
+Custom deserialization:
+- Memorizes received value and invocation result. For the same value always return the same result.
+
 
 ```js
 function mapDeserializer (key, obj) {
