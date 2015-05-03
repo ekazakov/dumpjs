@@ -1,5 +1,5 @@
 {
-  "name": "dump",
+  "name": "dumpjs",
   "version": "0.1.0",
   "description": "Serialize and deserialize any JS objects to JSON",
   "repository": {
