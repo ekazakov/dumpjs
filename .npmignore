@@ -1,0 +1,9 @@
+/.jscsrc
+/.jshintrc
+/.editorconfig
+/.projectile
+/gulpfile.js
+/karma.conf.js
+/tests
+
+
