@@ -5,7 +5,12 @@ But JSON stringify/parse is not enough,
 because you need support circular links and restore custom object.
 
 Dumpjs allow easily serialize to JSON and restore any object. 
-It handle circular links, preserve identities and support custom serialization/deserialization handlers.
+
+Main points:
+- It handle circular links
+- Preserve object identities 
+- Works with any level of nesting objects
+- Support custom serialization/deserialization handlers
 
 **Circular links**
 
