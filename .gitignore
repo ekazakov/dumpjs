@@ -1,6 +1,5 @@
+.tern-port
 /node_modules
 /tmp
-.tern-port
-/tests/index.js
-/dist
-.idea/
+/.idea
+/coverage

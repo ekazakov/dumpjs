@@ -2,47 +2,46 @@
 
 var gulp = require('gulp');
 var gutil = require('gulp-util');
-var path = require('path');
 var browserify = require('browserify');
-var watchify = require('watchify');
 var karma = require('gulp-karma');
+//var fs = require('fs');
+//var exorcist = require('exorcist');
+var derequire = require('derequire/plugin');
 
-var vinitlSource = require('vinyl-source-stream');
-// var buffer = require('vinyl-buffer');
-// var transform = require('vinyl-transform');
+var source = require('vinyl-source-stream');
+var buffer = require('vinyl-buffer');
+//var transform = require('vinyl-transform');
 
-var testsIndex = path.join(__dirname, 'tests-index.js');
+var uglify = require('gulp-uglify');
+var sourcemaps = require('gulp-sourcemaps');
+var gutil = require('gulp-util');
 
-gutil.log('path:', testsIndex);
+gulp.task('dist', function () {
+    var b = browserify({
+        entries: './src/dump.js',
+        debug: true,
+        standalone: 'dump'
+    });
 
-var testsBundler = watchify(browserify(testsIndex, watchify.args));
+    return b
+        .transform('babelify')
+        .plugin(derequire)
+        .bundle()
+        .pipe(source('dump.js'))
+        .pipe(buffer())
+        .pipe(sourcemaps.init({loadMaps: true}))
+            // Add transformation tasks to the pipeline here.
+            .pipe(uglify({mangle: false}))
+            .on('error', gutil.log)
+        .pipe(sourcemaps.write('./'))
+        .pipe(gulp.dest('./dist/'))
+        .on('end', function () {
+            gutil.log('Build done!');
+        })
+    ;
+});
 
-//gulp.task('tests', function () {
-//    rebundle(testsBundler, testsIndex)();
-//});
-
-testsBundler.on('update', rebundle(testsBundler, testsIndex));
-testsBundler.on('log', gutil.log);
-
-function rebundle (bundler) {
-    return function (files) {
-        gutil.log('changed files:', files);
-
-        return bundler.bundle()
-            .on('error', function (error) {
-                // gutil.log(error);
-                gutil.log(error.message);
-                // gutil.log(error.stack);
-                // gutil.log.bind(gutil, 'Browserify Error')
-            })
-            .pipe(vinitlSource('index.js'))
-            // .pipe(buffer())
-            .pipe(gulp.dest('./tests'))
-            ;
-    };
-}
-
-gulp.task('test', function () {
+gulp.task('karma:run', function () {
     // Be sure to return the stream
     return gulp.src(['./tests/spec/*'])
         .pipe(karma({
@@ -50,8 +49,9 @@ gulp.task('test', function () {
             action: 'run'
         }))
         .on('error', function (err) {
+            console.log(arguments);
             // Make sure failed tests cause gulp to exit non-zero
-            throw err;
+            //throw err;
         })
         .on('end', function () {
             gutil.log('Done!');
