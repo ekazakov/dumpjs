@@ -49,6 +49,6 @@ module.exports = function (config) {
             reportSuccess: true
         },
 
-        logLevel: 'LOG_INFO',
+        logLevel: 'INFO',
     });
 };
