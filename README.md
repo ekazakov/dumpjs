@@ -1,7 +1,5 @@
 # dumpjs
 
-# dumpjs
-
 Serialize and deserialize any JS objects to JSON.
 
 Sometimes you need serialize your objects to JSON and deserialize them back again. 
