@@ -48,6 +48,39 @@ var restored = D.restore(D.dump(obj3));
 restored[0] === restored[1]; // true
 ```
 
+**Custom serializers/deserializers**
+
+Function `dump` recives options as second argument.
+
+`serializer` – function for custom serialization. 
+Receives property name and value. Return `undefined` to prevent property serialization. 
+
+```js
+var obj = {m: new Map ([['a', 1], ['b', 2]])};
+
+function mapSerializer (key, obj) {
+    if (obj instanceof Map) return {
+        entries: [...obj],
+        '__meta__': 'ES6Map'
+    };
+
+    return obj;
+}
+```
+
+```js
+function mapDeserializer (key, obj) {
+    if (obj && obj['__meta__'] === 'ES6Map') {
+        return new Map(obj.entries);
+    }
+
+    return obj;
+}
+
+var json = D.dump(obj, {serializer: mapSerializer});
+var restored = D.restore(json, {deserializer: mapDeserializer});
+```
+
 ## Install
 
 ```
