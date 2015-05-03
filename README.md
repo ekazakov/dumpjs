@@ -34,6 +34,20 @@ Dumpjs creates IDs for every object and use them as references.
 
 **Preserve identities**
 
+```js
+var obj2 = {x: 1, y: 2};
+var obj3 = [obj2, obj2];
+var restored = JSON.parse(JSON.stringify(obj3));
+restored[0] === restored[1]; // false
+```
+
+JSON.parse create completly different objects.
+
+```js
+var restored = D.restore(D.dump(obj3));
+restored[0] === restored[1]; // true
+```
+
 ## Install
 
 ```
