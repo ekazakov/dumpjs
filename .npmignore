@@ -2,8 +2,10 @@
 /.jshintrc
 /.editorconfig
 /.projectile
+/.idea
 /gulpfile.js
 /karma.conf.js
 /tests
+/coverage
 
 
