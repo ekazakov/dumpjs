@@ -12,7 +12,7 @@ Main points:
 - Works with any level of nesting objects
 - Support custom serialization/deserialization handlers
 
-It use ES6 collections internally and need polyfill in old browsers.
+> **It use ES6 collections internally and need polyfill in old browsers.**
 
 ## API
 
