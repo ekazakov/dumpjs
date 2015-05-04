@@ -12,6 +12,36 @@ Main points:
 - Works with any level of nesting objects
 - Support custom serialization/deserialization handlers
 
+It use ES6 collections internally and need polyfill in old browsers.
+
+## API
+
+### `D.dump(target[,options])` -> `JSON`
+
+**Target** 
+
+Plain object or array which need to be serialized.
+
+**Options**
+
+`options.serializer(key, value)` — custom serialization function
+
+- If function returns `undefined`, then property will be ignored. Any other returned value will be serialized.
+If function returns `null`, then property will be serialized as `null` (`JSON.stringify` converts `undefined` to `null`).
+- Memorizes received value and invocation result. For the same value always return the same result.
+
+### `D.restore(source[,options])` -> `Object|Array`
+
+**Source**
+
+Valid JSON for deserialization
+
+**Options**
+
+`options.deserializer(key, value)` – custom deserialization
+- Memorizes received value and invocation result. For the same value always return the same result.
+
+
 **Circular links**
 
 ```js
@@ -57,8 +87,8 @@ restored[0] === restored[1]; // true
 
 `options.serializer(key, value)` 
 Custom serialization:
-- Return `undefined`, if you want prevent serialization of the property. If function returns `null`, then property will be serialized as `null` (`JSON.stringify` converts `undefined` to `null`).
-- Memorizes received value and invocation result. For the same value always return the same result.
+- Return `undefined`, if you want prevent serialization of the property. If function returns `null`, then property will be serialized as `null` (`JSON.stringify` converts `undefined` to `null`)
+- Memorizes received value and invocation result. For the same value always return the same result
 
 
 ```js
@@ -82,11 +112,6 @@ function mapSerializer (key, obj) {
 // }
 ```
 
-**`D.restore(string[,options])`**
-
-`options.deserializer(key, value)` 
-Custom deserialization:
-- Memorizes received value and invocation result. For the same value always return the same result.
 
 
 ```js
@@ -110,6 +135,6 @@ npm install --save dumpjs
 
 Works in node and browser.
 
-## How to use
+
 
 
