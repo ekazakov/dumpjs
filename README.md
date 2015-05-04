@@ -41,6 +41,7 @@ Valid JSON for deserialization
 `options.deserializer(key, value)` – custom deserialization
 - Memorizes received value and invocation result. For the same value always return the same result.
 
+## Examples
 
 **Circular links**
 
@@ -83,14 +84,6 @@ restored[0] === restored[1]; // true
 
 **Custom serializers/deserializers**
 
-**`D.dump(object|array[,options])`** 
-
-`options.serializer(key, value)` 
-Custom serialization:
-- Return `undefined`, if you want prevent serialization of the property. If function returns `null`, then property will be serialized as `null` (`JSON.stringify` converts `undefined` to `null`)
-- Memorizes received value and invocation result. For the same value always return the same result
-
-
 ```js
 var obj = {m: new Map ([['a', 1], ['b', 2]])};
 
@@ -110,11 +103,7 @@ function mapSerializer (key, obj) {
 //   "@3": ["a", 1],
 //   "@4": ["b", 2]
 // }
-```
 
-
-
-```js
 function mapDeserializer (key, obj) {
     if (obj && obj['__meta__'] === 'ES6Map') {
         return new Map(obj.entries);
