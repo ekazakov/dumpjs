@@ -9,9 +9,9 @@ module.exports = function (config) {
         browsers: [
             //'PhantomJS',
             'Chrome',
-            'Firefox',
-            'Safari',
-            'Opera'
+            //'Firefox',
+            //'Safari',
+            //'Opera'
         ],
         reporters: ['progress', 'notify', 'coverage'],
         frameworks: ['browserify', 'mocha', 'chai-sinon', 'sinon'],
@@ -30,11 +30,11 @@ module.exports = function (config) {
         browserify: {
             debug: true,
             transform: [
-                //'babelify',
-                istanbul({
-                    instrumenter: isparta,
-                    ignore: ['**/node_modules/**', '**/test/**'],
-                })
+                'babelify',
+                //istanbul({
+                //    instrumenter: isparta,
+                //    ignore: ['**/node_modules/**', '**/test/**'],
+                //})
             ],
             configure: function (bundle) {
                 bundle.on('bundled', function (error) {

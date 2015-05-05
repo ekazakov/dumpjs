@@ -18,7 +18,16 @@ function dump (root, options) {
     const identities = new Map();
     let id = 0;
     const key = getId(id);
-    const serializer = createObjectHandler(options && options.serializer);
+    const handler = createObjectHandler(options && options.serializer);
+
+    const serializer = function (key, value) {
+        var result = handler(key, value);
+
+        if (result instanceof Map)
+            return {entries: [...result], '__dump__': 'ES6Map'};
+
+        return result;
+    };
 
     if (root == null) return;
 
@@ -74,7 +83,7 @@ function dump (root, options) {
 
 function restore (data, options) {
     const visited = new Set();
-    const deserializer = createObjectHandler(options && options.deserializer);
+    const handler = createObjectHandler(options && options.deserializer);
     const source = JSON.parse(data);
     const keysList = keys(source);
 
@@ -98,7 +107,24 @@ function restore (data, options) {
         if (item == null || isPrimitive(item) || Object.isFrozen(item))
             continue;
 
-        keys(item).forEach(createPropHandler(item, visited, deserializer));
+        if (item instanceof Map) {
+            for (let [key, value] of item) {
+                const transformed = deserializer(key, value);
+                item.set(key, transformed);
+                if (!visited.has(transformed)) visited.add(transformed);
+            }
+        } else
+            keys(item).forEach(createPropHandler(item, visited, deserializer));
+    }
+
+    function deserializer (key, value) {
+        var result = handler(key, value);
+
+        if (result != null && result['__dump__'] === 'ES6Map') {
+            return new Map(result.entries);
+        }
+
+        return result;
     }
 
     return source['@0'];
