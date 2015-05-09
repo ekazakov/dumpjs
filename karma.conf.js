@@ -9,11 +9,11 @@ module.exports = function (config) {
         browsers: [
             //'PhantomJS',
             'Chrome',
-            'Firefox',
-            'Safari',
-            'Opera'
+            //'Firefox',
+            //'Safari',
+            //'Opera'
         ],
-        reporters: ['progress', 'notify', 'coverage'],
+        reporters: ['spec', 'notify', 'coverage'],
         frameworks: ['browserify', 'mocha', 'chai-sinon', 'sinon'],
 
         // list of files / patterns to load in the browser
@@ -49,6 +49,6 @@ module.exports = function (config) {
             reportSuccess: true
         },
 
-        logLevel: 'INFO',
+        logLevel: config.INFO,
     });
 };
