@@ -48,7 +48,7 @@ describe('Object litearals and arrays', function () {
 
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({'@0': {x: 1, y: 'a', z: null, g: false}});
-            
+
             expect(D.dump(obj)).to.be.eql(dumpedObj);
         });
 
