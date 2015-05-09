@@ -320,8 +320,7 @@ describe('Object litearals and arrays', function () {
         it('Restore with custom deserializer', function () {
             var json = D.dump(obj, {serializer: dateSerializer});
             var restoredObj = D.restore(json, {deserializer: dateDeserializer});
-            console.log('1', restoredObj);
-            console.log('2', obj);
+
             expect(restoredObj).to.be.eql(obj);
         });
 
@@ -394,7 +393,6 @@ describe('Object litearals and arrays', function () {
         function personDeserializer (key, value) {
 
             if (value && value['__meta__'] === 'person') {
-                //console.log(value);
                 return Object.freeze(new Person(value.data.firstName, value.data.lastName));
             }
 
@@ -420,9 +418,7 @@ describe('Object litearals and arrays', function () {
         it('Restore', function () {
             var json = D.dump(obj, {serializer: personSerializer});
             var restore = D.restore(json, {deserializer: personDeserializer});
-            //console.log('json', json);
-            //console.log('restore', restore);
-            //console.log(obj);
+
             expect(restore.j).to.be.equals(restore.j2);
             expect(restore).to.be.eql(obj);
         });
@@ -485,7 +481,6 @@ describe('Object litearals and arrays', function () {
                 '@6': {'width': 150, 'height': 150}
             });
 
-            //console.log(D.dump(obj, {serializer: serializer}));
             expect(D.dump(obj, {serializer: serializer})).to.be.eql(dumpedObj);
         });
 
@@ -563,9 +558,9 @@ describe('Object litearals and arrays', function () {
         it('Restore', function () {
             var json = D.dump(obj, {serializer: mapSerializer});
             var restore = D.restore(json, {deserializer: mapDeserealizer});
-            console.log('json', json);
-            console.log('restore', restore);
-            console.log(obj);
+            //console.log('json', json);
+            //console.log('restore', restore);
+            //console.log(obj);
             //expect(restore.j).to.be.equals(restore.j2);
             expect(restore).to.be.eql(obj);
         });
