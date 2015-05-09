@@ -38,19 +38,16 @@
     "karma": "^0.12.31",
     "karma-browserify": "^4.1.2",
     "karma-chai": "^0.1.0",
-    "karma-chai-sinon": "^0.1.4",
     "karma-chrome-launcher": "^0.1.7",
     "karma-coverage": "git://github.com/douglasduteil/karma-coverage#next",
     "karma-firefox-launcher": "^0.1.4",
     "karma-mocha": "^0.1.10",
     "karma-notify-reporter": "^0.1.1",
     "karma-opera-launcher": "^0.1.0",
-
     "karma-safari-launcher": "^0.1.1",
     "karma-sinon": "^1.0.4",
     "karma-spec-reporter": "0.0.19",
     "mocha": "^2.2.4",
-
     "split": "^0.3.3",
     "vinyl-buffer": "^1.0.0"
   }
