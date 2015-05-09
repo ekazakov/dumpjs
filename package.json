@@ -33,7 +33,7 @@
     "gulp-uglify": "^1.2.0",
     "gulp-util": "^3.0.4",
     "immutable": "^3.7.2",
-    "isparta": "git://github.com/douglasduteil/isparta",
+    "isparta": "douglasduteil/isparta",
     "jscs": "^1.13.1",
     "karma": "^0.12.31",
     "karma-browserify": "^4.1.2",
