@@ -14,7 +14,7 @@ module.exports = function (config) {
             //'Opera'
         ],
         reporters: ['spec', 'notify', 'coverage'],
-        frameworks: ['browserify', 'mocha', 'chai-sinon', 'sinon'],
+        frameworks: ['browserify', 'mocha', 'chai'],
 
         // list of files / patterns to load in the browser
         files: ['./tests/spec/**/*.js'],

@@ -20,39 +20,42 @@ var customLaunchers = {
         browserName: 'chrome'
     },
 
-    'SL_IE': {
-        base: 'SauceLabs',
-        browserName: 'internet explorer',
-        version: '9'
-    },
+    //'SL_IE': {
+    //    base: 'SauceLabs',
+    //    browserName: 'internet explorer',
+    //    version: '9'
+    //},
+    //
+    //'SL_Firefox': {
+    //    base: 'SauceLabs',
+    //    browserName: 'firefox'
+    //},
 
-    'SL_Firefox': {
-        base: 'SauceLabs',
-        browserName: 'firefox'
-    },
+    //'SL_Safari': {
+    //    base: 'SauceLabs',
+    //    browserName: 'safari',
+    //    varsion: '6',
+    //    platform: 'Mac OS X 10.8'
+    //},
 
-    'SL_Safari': {
-        base: 'SauceLabs',
-        browserName: 'safari'
-    },
+    //'SL_iOS': {
+    //    base: 'SauceLabs',
+    //    browserName: 'iphone',
+    //    version: '6.1'
+    //},
 
-    'SL_iOS': {
-        base: 'SauceLabs',
-        browserName: 'iphone'
-    },
-
-    'SL_Android': {
-        base: 'SauceLabs',
-        browserName: 'android'
-    }
+    //'SL_Android': {
+    //    base: 'SauceLabs',
+    //    browserName: 'android'
+    //}
 };
 
 module.exports = function (config) {
     'use strict';
 
     config.set({
-        reporters: ['progress', 'notify', 'coverage'],
-        frameworks: ['browserify', 'mocha', 'chai-sinon', 'sinon'],
+        reporters: ['dots', 'saucelabs', 'notify', 'coverage'],
+        frameworks: ['browserify', 'mocha', 'chai'],
 
         // list of files / patterns to load in the browser
         files: ['./tests/spec/**/*.js'],
@@ -84,12 +87,13 @@ module.exports = function (config) {
         },
 
         logLevel: config.LOG_INFO,
+        color: true,
 
         sauceLabs: {
             testName: 'Dumpjs tests'
         },
 
-        captureTimeout: 120000,
+        captureTimeout: 200000,
         customLaunchers: customLaunchers,
 
         browsers: Object.keys(customLaunchers),
