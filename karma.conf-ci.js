@@ -17,7 +17,8 @@ if (!process.env.SAUCE_USERNAME) {
 var customLaunchers = {
     'SL_Chrome': {
         base: 'SauceLabs',
-        browserName: 'chrome'
+        browserName: 'chrome',
+        platform: 'Mac OS X 10.9'
     },
 
     //'SL_IE': {

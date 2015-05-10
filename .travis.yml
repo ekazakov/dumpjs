@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+    - "0.12"
+before_install:
+    - npm install -g karma-cli
+script:
+    - karma start karma.conf-sauce.js
+#sudo: false
+addons:
+    sauce_connect:
+        username: "ekazakov"
+        access_key:
+            secure: "Ww0U2jDz4lkHOu9LhkI2P+KBE02c35OSaIo8B2byS/OeLLFZJ2qW45cSVSkewqdfTTpOU/XDRa9h1Uy/cSUspJBnr186pNU3s5JGjTjP0CIX8AxFw01IoW3zzrzaRG9NGOVY9Uh/QrKAEScBogfSm+2zi42Mv4f1MUA8CSPbQ/5aTZtD+dYVKn0MqAI5qhBx9gsOfyMfNC30aXRDCZ+t+ZMDy5D+/+faI5dW9iwVQmS1KQxYCmGRNZDWJXIKmnJeqgT/dbw+QnfgZSvjfyfyWJ7R5MKMiyM2EUNEo3uSpn9F5QasNeKh518+qTTGYJQZklsfAl1a77Y0rl3WCXdXV/KZQO7Z3xfHXhIOWU86Jx6mIOmD/msP3tZ5dW/hRuCkQJ/Jg7fn6YgmzVA6jZUSyuadKBLtBiEOICSqUQrCyqXxR4kUFFgkbPP12CQKbwzQlYlW/Jsvyq2k+HHtlHqNt0z5LM5TiHT5pPJOn0arE52LAH5BHiBYM7a/OH8bQAfazUs3HphEvJYkj4c9S+7lAuXf9AjgW0MmK0ExTWxjmiI6Bak2V0UtApnIWTrYJ6uSo7YTbte97CrNfBO/LgluqpHAbsfNVTmkFo4k9yTChQ3U09TiOEdO7bTfUcNTg2hcE9fjAkwXgR2bExFTtxGLpmUzQqjWZzpt+TG141E84/0="
