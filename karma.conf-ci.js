@@ -91,7 +91,8 @@ module.exports = function (config) {
         color: true,
 
         sauceLabs: {
-            testName: 'Dumpjs tests'
+            testName: 'Dumpjs tests',
+            build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')'
         },
 
         captureTimeout: 200000,
