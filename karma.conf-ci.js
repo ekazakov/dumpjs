@@ -21,11 +21,11 @@ var customLaunchers = {
         platform: 'Mac OS X 10.9'
     },
 
-    //'SL_IE': {
-    //    base: 'SauceLabs',
-    //    browserName: 'internet explorer',
-    //    version: '9'
-    //},
+    'SL_IE': {
+        base: 'SauceLabs',
+        browserName: 'internet explorer',
+        version: '9'
+    },
     //
     //'SL_Firefox': {
     //    base: 'SauceLabs',
@@ -91,7 +91,8 @@ module.exports = function (config) {
         color: true,
 
         sauceLabs: {
-            testName: 'Dumpjs tests'
+            testName: 'Dumpjs tests',
+            build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')'
         },
 
         captureTimeout: 200000,
