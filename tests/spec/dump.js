@@ -24,18 +24,21 @@ function squeeze (str) {
     return str.replace(/\s/ig, '');
 }
 
-function noop () {}
+function noop () {
+}
 
 describe('Object litearals and arrays', function () {
     describe('Empty ojbect', function () {
         it('Serialize', function () {
             var dumpedObj = squeeze(JSON.stringify({'@0': {}}));
+
             expect(D.dump({})).to.be.eql(dumpedObj);
         });
 
         it('Restore mpty object', function () {
             var obj = deepFreeze({});
             var json = D.dump(obj);
+
             expect(D.restore(json)).to.be.instanceOf(Object);
         });
     });
@@ -45,6 +48,7 @@ describe('Object litearals and arrays', function () {
 
         it('Serialize', function () {
             var dumpedObj = JSON.stringify({'@0': {x: 1, y: 'a', z: null, g: false}});
+
             expect(D.dump(obj)).to.be.eql(dumpedObj);
         });
 
@@ -550,7 +554,6 @@ describe('Object litearals and arrays', function () {
                 '@14': ['a', 1],
                 '@15': ['b', '2']
             });
-            //console.log(D.dump(obj, {serializer: mapSerializer}));
             expect(D.dump(obj, {serializer: mapSerializer})).to.be.eql(dumpedObj);
         });
 

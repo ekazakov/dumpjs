@@ -13,8 +13,8 @@ module.exports = function (config) {
             //'Safari',
             //'Opera'
         ],
-        reporters: ['progress', 'notify', 'coverage'],
-        frameworks: ['browserify', 'mocha', 'chai-sinon', 'sinon'],
+        reporters: ['spec', 'notify', 'coverage'],
+        frameworks: ['browserify', 'mocha', 'chai'],
 
         // list of files / patterns to load in the browser
         files: ['./tests/spec/**/*.js'],
@@ -49,6 +49,6 @@ module.exports = function (config) {
             reportSuccess: true
         },
 
-        logLevel: 'INFO',
+        logLevel: config.LOG_INFO,
     });
 };

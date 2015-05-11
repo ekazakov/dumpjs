@@ -3,8 +3,10 @@
 /.editorconfig
 /.projectile
 /.idea
+/.travis.yml
+/.gitignore
 /gulpfile.js
-/karma.conf.js
+/karma*
 /tests
 /coverage
 
