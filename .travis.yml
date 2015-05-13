@@ -3,7 +3,7 @@ node_js:
     - "0.12"
 before_install:
     - npm install -g karma-cli
-    - pip install codecov
+    - sudo pip install codecov
 script:
     - karma start karma.conf-ci.js
 after_success:
