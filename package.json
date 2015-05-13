@@ -14,7 +14,7 @@
     "json"
   ],
   "scripts": {
-    "coverage": "cat ./coverage/text.txt && cat ./coverage/report-lcovonly.txt | ./node_modules/codecov.io/bin/codecov.io.js"
+    "coverage": "cat ./coverage/text.txt && cat ./coverage/report-lcovonly.txt | codecov"
   },
   "author": "Evgeniy Kazakov <evgeniy.kazakov@gmail.com>",
   "license": "MIT",
