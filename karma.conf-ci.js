@@ -55,7 +55,7 @@ module.exports = function (config) {
     'use strict';
 
     config.set({
-        reporters: ['dots', 'saucelabs', 'notify', 'coverage'],
+        reporters: ['dots', 'saucelabs', 'coverage'],
         frameworks: ['browserify', 'mocha', 'chai'],
 
         // list of files / patterns to load in the browser
@@ -82,10 +82,18 @@ module.exports = function (config) {
             }
         },
 
-        notifyReporter: {
-            reportEachFailure: true,
-            reportSuccess: true
+        coverageReporter: {
+            reporters: [
+                { type: 'lcovonly', subdir: '.', file: 'report-lcovonly.txt' },
+                { type: 'text', subdir: '.', file: 'text.txt' },
+                { type: 'text-summary', subdir: '.', file: 'text-summary.txt' },
+            ]
         },
+
+        //notifyReporter: {
+        //    reportEachFailure: true,
+        //    reportSuccess: true
+        //},
 
         logLevel: config.LOG_INFO,
         color: true,

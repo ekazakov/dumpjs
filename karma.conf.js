@@ -9,7 +9,7 @@ module.exports = function (config) {
         browsers: [
             //'PhantomJS',
             'Chrome',
-            //'Firefox',
+            'Firefox',
             //'Safari',
             //'Opera'
         ],
@@ -33,7 +33,7 @@ module.exports = function (config) {
                 //'babelify',
                 istanbul({
                     instrumenter: isparta,
-                    ignore: ['**/node_modules/**', '**/test/**'],
+                    ignore: ['**/node_modules/**', '**/test/**']
                 })
             ],
             configure: function (bundle) {
@@ -42,6 +42,14 @@ module.exports = function (config) {
                         console.error(error.message);
                 });
             }
+        },
+
+        coverageReporter: {
+            reporters: [
+                { type: 'lcovonly', subdir: '.', file: 'report-lcovonly.txt' },
+                { type: 'text', subdir: '.', file: 'text.txt' },
+                { type: 'text-summary', subdir: '.', file: 'text-summary.txt' },
+            ]
         },
 
         notifyReporter: {
