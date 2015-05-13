@@ -13,6 +13,9 @@
     "deserialize",
     "json"
   ],
+  "scripts": {
+    "coverage": "cat ./coverage/text.txt && cat ./coverage/report-lcovonly.txt | ./node_modules/codecov.io/bin/codecov.io.js"
+  },
   "author": "Evgeniy Kazakov <evgeniy.kazakov@gmail.com>",
   "license": "MIT",
   "readmeFilename": "README.md",

@@ -7,8 +7,8 @@ before_install:
 script:
     - karma start karma.conf-ci.js
 after_success:
-    - cat ./coverage/report-lcovonly.txt | codecov
-    - cat coverage/text.txt
+    - "npm run coverage"
+
 env:
     global:
         - secure: upvhcpCiLS3NDac1N2KSXjqZl4ZAIHZVLTCvFmPzzzlWPLQ80uSIqKZQeHTUP9CPr/4bYlvbQBvOiRP66OFlQ+R/vYRH4u1DIO0v7XsJRDgIMgI5ECSSUi104isyrhyb93n9FGgsjcKME5uGjjdqNLi7JWr/69OiZ7bOQqKJvzExyxlSW/x/tMJnRMngHyCFhajsWDSXPq31bKkTAHnEvPos9AKvUc01etRjMfZKlwqXNWGKGT5jJ/w1lmE7xmDlX7Zl/aFYYz7HBdaI8sbvFmX5r9+XjqkD9Y17BiwI/PdJoAl3xuqYYQLil8s5gbZUN3OpBSE9rrIi0QYubBkMDXuiaiATTvbUGG54swe8ErIJGinF2UU6i0wvkswczQ5ZXphtSeWFHJfhu/fF85Hd+KVr3LfWwoNZpGWBoG5v/0dE/CT0Y7RmMZJBp74HPva5d7jNe5PuLAAh2TcE/c7KIKEVST7hWUpTsrm799b2/IdjYDVuMDlBhQxguMBp14YY/zElsdKHcfXV5Pgc1R9WTC55xVgpL8TacUv+98tCcS7gKfZM0s5lZVXj1e94yP3offz74nwnewFTCf+GcaJzHE2F237hrcFONMJwJ2eMz0PFz7kiIw1VpJV2RF37NC+j0DC9Q0nTgrG/t15//1+0F4tycIbiTfqr5wq0rom/z2E=
