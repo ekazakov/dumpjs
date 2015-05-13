@@ -3,11 +3,11 @@ node_js:
     - "0.12"
 before_install:
     - npm install -g karma-cli
-    - npm install -g codecov.io
+    - npm install codecov.io
 script:
     - karma start karma.conf-ci.js
 after_success:
-    - "npm run coverage"
+    - npm run coverage
 
 env:
     global:
