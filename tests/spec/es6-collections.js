@@ -6,6 +6,7 @@
 var deepFreeze = require('deep-freeze-strict');
 var D = require('../../src/dump');
 var merge = require('../../src/utils').merge;
+var deepEqual = require('deep-equal');
 
 describe('ES6 Collections', function () {
     describe('ES6 Map', function () {
@@ -34,18 +35,18 @@ describe('ES6 Collections', function () {
                 '@13': ['@14'],
                 '@14': ['k', 1]
             });
-            console.log(D.dump(obj));
             expect(D.dump(obj)).to.be.eql(dumpedObj);
         });
 
         it('Restore', function () {
             var restored = D.restore(D.dump(obj));
-            console.log(restored);
-            expect(restored.m).to.be.instanceOf(Map);
-            expect(restored.m.get('d')).to.be.instanceOf(Map);
-            expect(restored.m.get('d').get('g')).to.be.instanceOf(Map);
+            expect(deepEqual(restored, obj)).to.be.ok;
         });
-    })
+    });
+
+    describe('Nested ES6 Map', function () {
+
+    });
 });
 
 function getMapEntries (map) {
