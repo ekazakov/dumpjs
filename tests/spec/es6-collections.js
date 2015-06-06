@@ -44,8 +44,61 @@ describe('ES6 Collections', function () {
         });
     });
 
-    describe('Nested ES6 Map', function () {
+    describe('ES6 Map with Map as key', function () {
+        var map2 = new Map([['k', 1]]);
+        var map1 = new Map([['f', 4], [map2, 5]]);
+        var map = new Map([['a', 1], [map1, 2], ['c', 3]]);
+        var obj = deepFreeze({m: map});
 
+        it('Serialization', function () {
+            var dumpedObj = JSON.stringify({
+                '@0': {'m': '@1'},
+                '@1': {'entries': '@2', '__dump__': 'ES6Map'},
+                '@2': ['@3', '@4', '@5'],
+                '@3': ['a', 1],
+                '@4': ['@6', 2],
+                '@5': ['c', 3],
+                '@6': {'entries': '@7', '__dump__': 'ES6Map'},
+                '@7': ['@8', '@9'],
+                '@8': ['f', 4],
+                '@9': ['@10', 5],
+                '@10': {'entries': '@11', '__dump__': 'ES6Map'},
+                '@11': ['@12'],
+                '@12': ['k', 1]
+            });
+            expect(D.dump(obj)).to.be.eql(dumpedObj);
+        });
+
+        it('Restore', function () {
+            var restored = D.restore(D.dump(obj));
+            console.log(restored);
+            expect(deepEqual(restored, obj)).to.be.ok;
+        });
+    })
+
+    describe('ES6 Set', function () {
+        var set3 = new Set([6, 7]);
+        var set2 = new Set([4, 5, set3]);
+        var set = new Set([1, 2, 3, set2]);
+        var obj = deepFreeze({s: set});
+
+        it('Serializer', function () {
+            var dumpedObj = JSON.stringify({
+                '@0': {'s': '@1'},
+                '@1': {'values': '@2', '__dump__': 'ES6Set'},
+                '@2': [1, 2, 3, '@3'],
+                '@3': {'values': '@4', '__dump__': 'ES6Set'},
+                '@4': [4, 5, '@5'],
+                '@5': {'values': '@6', '__dump__': 'ES6Set'},
+                '@6': [6, 7]
+            });
+            expect(D.dump(obj)).to.be.eql(dumpedObj);
+        });
+
+        it('Restore', function () {
+            var restored = D.restore(D.dump(obj));
+            expect(deepEqual(restored, obj)).to.be.ok;
+        });
     });
 });
 

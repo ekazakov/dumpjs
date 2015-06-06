@@ -26,6 +26,9 @@ function dump (root, options) {
         if (result instanceof Map)
             return {entries: [...result], '__dump__': 'ES6Map'};
 
+        if (result instanceof Set)
+            return {values: [...result], '__dump__': 'ES6Set'};
+
         return result;
     };
 
@@ -92,9 +95,7 @@ function restore (data, options) {
     keysList.forEach(function (key) {
         const obj = source[key];
         keys(obj)
-            .filter(function (key) {
-                return isObjectRef(obj[key]);
-            })
+            .filter((key) => isObjectRef(obj[key]))
             .forEach(function iter (key) {
                 obj[key] = source[obj[key]];//deserializer(key, source[obj[key]]);
             })
@@ -113,6 +114,15 @@ function restore (data, options) {
                 item.set(key, transformed);
                 if (!visited.has(transformed)) visited.add(transformed);
             }
+        } else if (item instanceof Set) {
+            const setEntries = [...item.entries()];
+            item.clear();
+
+            for (let [key, value] of setEntries) {
+                const transformed = deserializer(key, value);
+                item.add(transformed);
+                if (!visited.has(transformed)) visited.add(transformed);
+            }
         } else
             keys(item).forEach(createPropHandler(item, visited, deserializer));
     }
@@ -122,6 +132,10 @@ function restore (data, options) {
 
         if (result != null && result['__dump__'] === 'ES6Map') {
             return new Map(result.entries);
+        }
+
+        if (result != null && result['__dump__'] === 'ES6Set') {
+            return new Set(result.values);
         }
 
         return result;
