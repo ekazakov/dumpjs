@@ -47,7 +47,7 @@ describe('ES6 Collections', function () {
     describe('ES6 Map with Map as key', function () {
         var map2 = new Map([['k', 1]]);
         var map1 = new Map([['f', 4], [map2, 5]]);
-        var map = new Map([['a', 1], [map1, 2], ['c', 3]]);
+        var map = new Map([['a', 1], [map1, 2], [{x: {z: 1}}, 3]]);
         var obj = deepFreeze({m: map});
 
         it('Serialization', function () {
@@ -57,21 +57,22 @@ describe('ES6 Collections', function () {
                 '@2': ['@3', '@4', '@5'],
                 '@3': ['a', 1],
                 '@4': ['@6', 2],
-                '@5': ['c', 3],
-                '@6': {'entries': '@7', '__dump__': 'ES6Map'},
-                '@7': ['@8', '@9'],
-                '@8': ['f', 4],
-                '@9': ['@10', 5],
-                '@10': {'entries': '@11', '__dump__': 'ES6Map'},
-                '@11': ['@12'],
-                '@12': ['k', 1]
+                '@5': ['@7', 3],
+                '@6': {'entries': '@8', '__dump__': 'ES6Map'},
+                '@7': {'x': '@9'},
+                '@8': ['@10', '@11'],
+                '@9': {'z': 1},
+                '@10': ['f', 4],
+                '@11': ['@12', 5],
+                '@12': {'entries': '@13', '__dump__': 'ES6Map'},
+                '@13': ['@14'],
+                '@14': ['k', 1]
             });
             expect(D.dump(obj)).to.be.eql(dumpedObj);
         });
 
         it('Restore', function () {
             var restored = D.restore(D.dump(obj));
-            console.log(restored);
             expect(deepEqual(restored, obj)).to.be.ok;
         });
     })

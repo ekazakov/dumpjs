@@ -109,10 +109,16 @@ function restore (data, options) {
             continue;
 
         if (item instanceof Map) {
-            for (let [key, value] of item) {
-                const transformed = deserializer(key, value);
-                item.set(key, transformed);
-                if (!visited.has(transformed)) visited.add(transformed);
+            const mapEntries = [...item.entries()];
+            item.clear();
+
+            for (let [key, value] of mapEntries) {
+                const transformedKey = deserializer(0, key);
+                const transformedValue = deserializer(1, value);
+
+                item.set(transformedKey, transformedValue);
+                if (!visited.has(transformedKey)) visited.add(transformedKey);
+                if (!visited.has(transformedValue)) visited.add(transformedValue);
             }
         } else if (item instanceof Set) {
             const setEntries = [...item.entries()];
