@@ -6,7 +6,7 @@
 var deepFreeze = require('deep-freeze-strict');
 var D = require('../../src/dump');
 var merge = require('../../src/utils').merge;
-var deepEqual = require('deep-equal');
+var deepEqual = require('@ekazakov/deep-equal');
 
 describe('ES6 Collections', function () {
     describe('ES6 Map', function () {

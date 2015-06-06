@@ -50,7 +50,7 @@
     "karma-safari-launcher": "^0.1.1",
     "karma-sauce-launcher": "^0.2.11",
     "karma-spec-reporter": "0.0.19",
-    "node-deep-equal": "git@github.com:ekazakov/node-deep-equal.git#1.1.0",
+    "@ekazakov/deep-equal": "^1.1.1",
     "mocha": "^2.2.4",
     "split": "^0.3.3",
     "vinyl-buffer": "^1.0.0",
