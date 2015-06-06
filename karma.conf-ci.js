@@ -21,11 +21,11 @@ var customLaunchers = {
         platform: 'Mac OS X 10.9'
     },
 
-    //'SL_IE': {
-    //    base: 'SauceLabs',
-    //    browserName: 'internet explorer',
-    //    version: '9'
-    //},
+    'SL_IE': {
+        base: 'SauceLabs',
+        browserName: 'internet explorer',
+        version: '9'
+    },
     //
     //'SL_Firefox': {
     //    base: 'SauceLabs',

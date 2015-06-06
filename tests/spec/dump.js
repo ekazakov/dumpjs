@@ -324,6 +324,7 @@ describe('Object litearals and arrays', function () {
         it('Restore with custom deserializer', function () {
             var json = D.dump(obj, {serializer: dateSerializer});
             var restoredObj = D.restore(json, {deserializer: dateDeserializer});
+
             expect(restoredObj).to.be.eql(obj);
         });
 
@@ -560,7 +561,10 @@ describe('Object litearals and arrays', function () {
         it('Restore', function () {
             var json = D.dump(obj, {serializer: mapSerializer});
             var restore = D.restore(json, {deserializer: mapDeserealizer});
-
+            //console.log('json', json);
+            //console.log('restore', restore);
+            //console.log(obj);
+            //expect(restore.j).to.be.equals(restore.j2);
             expect(restore).to.be.eql(obj);
         });
     });
