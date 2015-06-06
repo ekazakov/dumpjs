@@ -10,6 +10,7 @@ Main points:
 - It handle circular links
 - Preserve object identities 
 - Works with any level of nesting objects
+- Support ES6 Map and Set
 - Support custom serialization/deserialization handlers
 
 > **It use ES6 collections internally and need polyfill in old browsers.**
@@ -80,40 +81,6 @@ JSON.parse create completly different objects.
 ```js
 var restored = D.restore(D.dump(obj3));
 restored[0] === restored[1]; // true
-```
-
-**Custom serializers/deserializers**
-
-```js
-var obj = {m: new Map ([['a', 1], ['b', 2]])};
-
-function mapSerializer (key, obj) {
-    if (obj instanceof Map) return {
-        entries: [...obj],
-        '__meta__': 'ES6Map'
-    };
-
-    return obj;
-}
-
-// {
-//   "@0": {"map": "@1"},
-//   "@1": {"entries": "@2", "__meta__": "ES6Map"},
-//   "@2": ["@3", "@4"],
-//   "@3": ["a", 1],
-//   "@4": ["b", 2]
-// }
-
-function mapDeserializer (key, obj) {
-    if (obj && obj['__meta__'] === 'ES6Map') {
-        return new Map(obj.entries);
-    }
-
-    return obj;
-}
-
-var json = D.dump(obj, {serializer: mapSerializer});
-var restored = D.restore(json, {deserializer: mapDeserializer});
 ```
 
 ## Install
